@@ -32,3 +32,9 @@ const material2 = new THREE.MeshStandardMaterial({color:0x4d0099})
 const sphere = new THREE.Mesh(geometry2, material2)
 sphere.position.set(0, 0, 0)
 scene.add(sphere)
+
+const pointLight = new THREE.PointLight(0xffffff)
+pointLight.position.set(10, 10, 10)
+
+const ambientLight = new THREE.AmbientLight(0xffffff)
+scene.add(ambientLight, pointLight)
