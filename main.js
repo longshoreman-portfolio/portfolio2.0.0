@@ -25,3 +25,10 @@ const material = new THREE.MeshStandardMaterial({color:0x111111})
 const torus = new THREE.Mesh(geometry, material)
 torus.position.set(20, -9, 0)
 scene.add(torus)
+
+// sphere
+const geometry2 = new THREE.SphereGeometry(3.5, 30, 30)
+const material2 = new THREE.MeshStandardMaterial({color:0x4d0099})
+const sphere = new THREE.Mesh(geometry2, material2)
+sphere.position.set(0, 0, 0)
+scene.add(sphere)
