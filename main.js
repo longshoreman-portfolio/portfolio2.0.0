@@ -2,6 +2,8 @@ import './style.css'
 
 import * as THREE from 'three'
 
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+
 const scene = new THREE.Scene()
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -38,3 +40,6 @@ pointLight.position.set(10, 10, 10)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight, pointLight)
+
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableZoom = false;
