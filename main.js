@@ -41,7 +41,7 @@ pointLight.position.set(10, 10, 10)
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight, pointLight)
 
-const controls = new OrbitControls(camera, renderer.domElement)
+const camera = new THREE.OrthographicCamera( window.innerWidth / - 20, window.innerWidth / 20, window.innerHeight / 20, window.innerHeight / - 20, 1, 1000 )
 controls.enableZoom = false;
 
 function animate() {
