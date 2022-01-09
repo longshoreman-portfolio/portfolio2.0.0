@@ -43,3 +43,16 @@ scene.add(ambientLight, pointLight)
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableZoom = false;
+
+function animate() {
+    requestAnimationFrame(animate)
+
+    torus.rotation.x += 0.01
+    torus.rotation.y += 0.005
+    torus.rotation.z += 0.01
+
+    controls.update()
+
+    renderer.render(scene, camera)
+}
+animate()
