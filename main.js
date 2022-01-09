@@ -17,3 +17,11 @@ camera.position.setZ(50)
 renderer.render(scene, camera)
 
 scene.background = new THREE.Color( 0x181822 )
+
+
+// Torus shape
+const geometry = new THREE.TorusGeometry(10, 2.8, 30, 200)
+const material = new THREE.MeshStandardMaterial({color:0x111111})
+const torus = new THREE.Mesh(geometry, material)
+torus.position.set(20, -9, 0)
+scene.add(torus)
