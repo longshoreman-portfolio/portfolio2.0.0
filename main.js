@@ -12,7 +12,8 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerWidth)
-
-camera.position.setZ(30)
+camera.position.setZ(50)
 
 renderer.render(scene, camera)
+
+scene.background = new THREE.Color( 0x181822 )
