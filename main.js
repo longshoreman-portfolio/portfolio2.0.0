@@ -13,10 +13,8 @@ const renderer = new THREE.WebGLRenderer({
 })
 
 renderer.setPixelRatio(window.devicePixelRatio)
-renderer.setSize(window.innerWidth, window.innerWidth)
+renderer.setSize(window.innerWidth, window.innerHeight)
 camera.position.setZ(50)
-
-renderer.render(scene, camera)
 
 scene.background = new THREE.Color( 0x181822 )
 
@@ -35,11 +33,16 @@ const sphere = new THREE.Mesh(geometry2, material2)
 sphere.position.set(0, 0, 0)
 scene.add(sphere)
 
+
+
+
+
 const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(10, 10, 10)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight, pointLight)
+
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableZoom = false;
