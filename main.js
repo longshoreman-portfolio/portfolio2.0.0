@@ -3,6 +3,7 @@ import './style.css'
 import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { Cylindrical } from 'three'
 
 const scene = new THREE.Scene()
 
@@ -71,10 +72,6 @@ function boxWithRoundedEdges(width, height, depth, radius0, smoothness) {
 
 
 
-
-
-
-
 const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(10, 10, 10)
 
@@ -85,8 +82,8 @@ scene.add(ambientLight, pointLight)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableZoom = false;
 
-function animate() {
-    requestAnimationFrame(animate)
+function animateTorus() {
+    requestAnimationFrame(animateTorus)
 
     torus.rotation.x += 0.01
     torus.rotation.y += 0.005
@@ -96,4 +93,29 @@ function animate() {
 
     renderer.render(scene, camera)
 }
-animate()
+animateTorus()
+
+
+// add other light sources with diff renet color 
+// add more shapes
+// animate each shape alone 
+
+// use LatheGeometry for cylinder shape 
+
+
+
+async function cylinderWithroundedendge(radius, height, curve, smoothness) {
+    const points = [];
+    points[0] = new THREE.Vector2(0, height / 2);
+    for (let i = 0; i < smoothness ; i++) {
+        points.push( new THREE.Vector2( radius - curve + (i / smoothness), Math.sqrt( Math.pow(curve ,2) + Math.pow((i / smoothness) - radius + curve,2)) - height / 2 + curve) );
+    }
+    return points
+}
+
+const points = await cylinderWithroundedendge(10,10,.1,10)
+const geometry6 = new THREE.LatheGeometry( points );
+const material6 = new THREE.MeshStandardMaterial( { color: 0xffff00 } );
+const lathe = new THREE.Mesh( geometry6, material6 );
+scene.add( lathe );
+
