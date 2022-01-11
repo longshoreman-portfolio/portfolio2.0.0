@@ -109,7 +109,7 @@ animateTorus()
 // add more shapes
 // animate each shape alone 
 
-async function cylinderWithroundedendge(radius, height, curve, smoothness) {
+function cylinderWithroundedendge(radius, height, curve, smoothness) {
     const points = [];
 
     points.push(new THREE.Vector2(0,  height / 2))
@@ -127,7 +127,7 @@ async function cylinderWithroundedendge(radius, height, curve, smoothness) {
     return points
 }
 
-const points = await cylinderWithroundedendge(4,10,1,10)
+const points = cylinderWithroundedendge(4,10,1,10)
 console.log(points)
 const geometry6 = new THREE.LatheGeometry(  points ,50);
 const material6 = new THREE.MeshStandardMaterial( { color: 0x111111 , side: THREE.DoubleSide});
