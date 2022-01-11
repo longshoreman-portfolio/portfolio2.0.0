@@ -3,7 +3,6 @@ import './style.css'
 import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { Cylindrical } from 'three'
 
 const scene = new THREE.Scene()
 
@@ -72,6 +71,16 @@ function boxWithRoundedEdges(width, height, depth, radius0, smoothness) {
 
 
 
+/* to be tested more
+var light = new THREE.DirectionalLight(0xefefff, 1.5);
+light.position.set(1, 1, 1).normalize();
+scene.add(light);
+
+var light = new THREE.DirectionalLight(0xffefef, 1.5);
+light.position.set(-1, -1, -1).normalize();
+scene.add(light);
+*/
+
 const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(10, 10, 10)
 
@@ -100,22 +109,29 @@ animateTorus()
 // add more shapes
 // animate each shape alone 
 
-// use LatheGeometry for cylinder shape 
-
-
-
 async function cylinderWithroundedendge(radius, height, curve, smoothness) {
     const points = [];
-    points[0] = new THREE.Vector2(0, height / 2);
-    for (let i = 0; i < smoothness ; i++) {
-        points.push( new THREE.Vector2( radius - curve + (i / smoothness), Math.sqrt( Math.pow(curve ,2) + Math.pow((i / smoothness) - radius + curve,2)) - height / 2 + curve) );
+
+    points.push(new THREE.Vector2(0,  height / 2))
+
+    for (let i = 0 ; i <= smoothness ; i++) {
+        points.push( new THREE.Vector2( (curve / smoothness) * i + radius - curve , Math.sqrt(Math.pow(curve,2) - Math.pow((curve / smoothness) * i ,2)) + height / 2 - curve) )
     }
+
+    for (let i = smoothness ; i >= 0 ; i--) {
+        points.push( new THREE.Vector2( (curve / smoothness) * i + radius - curve , - Math.sqrt(Math.pow(curve,2) - Math.pow((curve / smoothness) * i ,2)) - height / 2 + curve) )
+    }
+
+    points.push(new THREE.Vector2(0,-height / 2))
+
     return points
 }
 
-const points = await cylinderWithroundedendge(10,10,.1,10)
-const geometry6 = new THREE.LatheGeometry( points );
-const material6 = new THREE.MeshStandardMaterial( { color: 0xffff00 } );
+const points = await cylinderWithroundedendge(4,10,1,10)
+console.log(points)
+const geometry6 = new THREE.LatheGeometry(  points ,50);
+const material6 = new THREE.MeshStandardMaterial( { color: 0x111111 , side: THREE.DoubleSide});
 const lathe = new THREE.Mesh( geometry6, material6 );
+lathe.position.set(20, -9, 0)
+lathe.scale.set(1, 1, 1);
 scene.add( lathe );
-
