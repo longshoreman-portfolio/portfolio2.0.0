@@ -29,23 +29,23 @@ controls.enableZoom = false;
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
 pointLightWhite.position.set(10, 10, 10)
 
-const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 20 )
+const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 30 )
 pointLightGreen.position.set(20, -9, 0)
 
-const pointLightOrange = new THREE.PointLight(0x00e68a, 1, 20 )
-pointLightOrange.position.set(20, -9, 0)
+const pointLightOrange = new THREE.PointLight(0xff9900, 1, 100 )
+pointLightOrange.position.set(-4, -10, -20)
 
 const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
 pointLightPurple.position.set(30, 10, -20)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
-scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple)
+scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
 
 /** Materials */
 const darkMaterial = new THREE.MeshStandardMaterial({color:0x111111})
 const purpleMaterial = new THREE.MeshStandardMaterial({color:0x4d0099})
 const greenMaterial = new THREE.MeshStandardMaterial({color:0x00995c, side: THREE.DoubleSide})
-
+const orangeMaterial = new THREE.MeshStandardMaterial({color:0xb36b00, side: THREE.DoubleSide})
 
 
 /** Torus shape */ 
@@ -87,13 +87,24 @@ function boxWithRoundedEdges(width, height, depth, radius0, smoothness) {
 /** Cube shape */  
 const geometryCube = new  boxWithRoundedEdges(10, 10, 10, 2, 6, 2)
 const cube = new THREE.Mesh(geometryCube, darkMaterial)
-cube.position.set(15, 5, -15)
+cube.position.set(15, 5, -30)
 
 cube.rotation.x = 10
 cube.rotation.y = 10
 cube.rotation.z = 10
 
 scene.add(cube)
+
+/** Small cube shape */
+const geometrySmallCube = new  boxWithRoundedEdges(3, 3, 3, 0.5, 6, 2)
+const smallCube = new THREE.Mesh(geometrySmallCube, greenMaterial)
+smallCube.position.set(20, -9, 0)
+
+smallCube.rotation.x = -40
+smallCube.rotation.y = -20
+smallCube.rotation.z = 20
+
+scene.add(smallCube)
 
 /** Cylinder helper */ 
 function cylinderWithroundedendge(radius, height, curve, smoothness) {
@@ -117,8 +128,13 @@ function cylinderWithroundedendge(radius, height, curve, smoothness) {
 /** Cylinder shpe */
 const points = cylinderWithroundedendge(4,9,1,10)
 const geometryCylinder = new THREE.LatheGeometry(  points ,50)
-const lathe = new THREE.Mesh( geometryCylinder, greenMaterial )
-lathe.position.set(20, -9, 0)
+const lathe = new THREE.Mesh( geometryCylinder, orangeMaterial )
+lathe.position.set(-4, -10, -20)
+
+lathe.rotation.x = 50
+lathe.rotation.y = 50
+lathe.rotation.z = 50
+
 lathe.scale.set(1, 1, 1);
 scene.add( lathe );
 
