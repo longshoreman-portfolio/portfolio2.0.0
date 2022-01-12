@@ -26,14 +26,20 @@ const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableZoom = false;
 
 /** Lights */
-const pointLightWhite = new THREE.PointLight(0xffffff)
+const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
 pointLightWhite.position.set(10, 10, 10)
 
-const pointLightGreen = new THREE.PointLight(0x00e68a)
+const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 20 )
 pointLightGreen.position.set(20, -9, 0)
 
+const pointLightOrange = new THREE.PointLight(0x00e68a, 1, 20 )
+pointLightOrange.position.set(20, -9, 0)
+
+const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
+pointLightPurple.position.set(30, 10, -20)
+
 const ambientLight = new THREE.AmbientLight(0xffffff)
-scene.add(ambientLight, pointLightWhite)
+scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple)
 
 /** Materials */
 const darkMaterial = new THREE.MeshStandardMaterial({color:0x111111})
