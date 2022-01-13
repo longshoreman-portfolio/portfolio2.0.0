@@ -140,20 +140,76 @@ scene.add( lathe );
 
 
 /** Animation */ 
-function animateTorus() {
-    requestAnimationFrame(animateTorus)
 
+/** Animation loop */
+
+var cubeDiractionX = false
+var cubeDiractionY = false
+
+var shpereGrowing = true
+
+function animateLoop() {
+
+
+    requestAnimationFrame(animateLoop)
+
+    /** Animate torus */
     torus.rotation.x += 0.01
     torus.rotation.y += 0.005
     torus.rotation.z += 0.01
 
+    /** Animate Cylinder */
+    lathe.rotation.x += 0.01
+    lathe.rotation.y += 0.03
+
+    /** Animate cube */
+    /** Cube translation */
+    cubeDiractionX ? cube.position.x -= 0.05 : cube.position.x += 0.05
+    cube.position.x >= 15 ? cubeDiractionX = true : null
+    cube.position.x <= -5 ? cubeDiractionX = false : null
+
+    cubeDiractionY ? cube.position.y -= 0.05 : cube.position.y += 0.05
+    cube.position.y >= 15 ? cubeDiractionY = true : null
+    cube.position.y <= -5 ? cubeDiractionY = false : null
+
+    /** Cube rotation */
+    cube.rotation.x += 0.01
+    cube.rotation.y += 0.01
+    cube.rotation.z += 0.01
+
+    /** Animate small cube */
+    smallCube.rotation.x += 0.005
+    smallCube.rotation.y += 0.005
+    smallCube.rotation.z += 0.005
+
+    /** Animation shpere */
+    shpereGrowing ? sphere.scale.x += 0.001 : sphere.scale.x -= 0.001
+    shpereGrowing ? sphere.scale.y += 0.001 : sphere.scale.y -= 0.001
+    shpereGrowing ? sphere.scale.z += 0.001 : sphere.scale.z -= 0.001
+    sphere.scale.x >= 1.4 ? shpereGrowing = false : null
+    sphere.scale.x <= 0.6 ? shpereGrowing = true : null
+    
     controls.update()
 
     renderer.render(scene, camera)
 }
-animateTorus()
+animateLoop()
 
 
-// add other light sources with diff renet color 
-// add more shapes
-// animate each shape alone 
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    const camera = new THREE.OrthographicCamera( window.innerWidth / - 20, window.innerWidth / 20, window.innerHeight / 20, window.innerHeight / - 20, 1, 1000 )
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector('#bg'),
+    })
+    
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    camera.position.setZ(50)
+
+}
