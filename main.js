@@ -3,7 +3,6 @@ import './style.css'
 import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { Cylindrical } from 'three'
 
 const scene = new THREE.Scene()
 
@@ -18,6 +17,9 @@ renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 camera.position.setZ(50)
 
+/** Scene size for diffrent window sizes */
+scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25)
+
 /** Background */
 scene.background = new THREE.Color( 0x181822 )
 
@@ -29,10 +31,10 @@ controls.enableZoom = false;
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
 pointLightWhite.position.set(10, 10, 10)
 
-const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 30 )
+const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 100 )
 pointLightGreen.position.set(20, -9, 0)
 
-const pointLightOrange = new THREE.PointLight(0xff9900, 1, 100 )
+const pointLightOrange = new THREE.PointLight(0xff5c33, 1, 100 )
 pointLightOrange.position.set(-4, -10, -20)
 
 const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
@@ -140,9 +142,7 @@ scene.add( lathe );
 
 
 /** Animation */ 
-
 /** Animation loop */
-
 var cubeDiractionX = false
 var cubeDiractionY = false
 
@@ -196,20 +196,19 @@ function animateLoop() {
 animateLoop()
 
 
+// TODO add nav bar 
+// TODO fix resier issue 
+// TODO add about drop down
+// TODO avatar 
+// TODO add text working on 
 
 
+
+
+/** Resize for diffrent window sizes */
 window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
-
-    const camera = new THREE.OrthographicCamera( window.innerWidth / - 20, window.innerWidth / 20, window.innerHeight / 20, window.innerHeight / - 20, 1, 1000 )
-
-    const renderer = new THREE.WebGLRenderer({
-        canvas: document.querySelector('#bg'),
-    })
-    
-    renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    camera.position.setZ(50)
-
+    window.location.reload()
+    window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
 }
