@@ -197,7 +197,6 @@ animateLoop()
 
 
 // TODO add nav bar 
-// TODO fix resier issue 
 // TODO add about drop down
 // TODO avatar 
 // TODO add text working on 
