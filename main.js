@@ -188,6 +188,8 @@ function animateLoop() {
     shpereGrowing ? sphere.scale.z += 0.001 : sphere.scale.z -= 0.001
     sphere.scale.x >= 1.4 ? shpereGrowing = false : null
     sphere.scale.x <= 0.6 ? shpereGrowing = true : null
+
+    scene.rotation.y += 0.003
     
     controls.update()
 
