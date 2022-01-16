@@ -44,6 +44,31 @@ canvas {
   margin-top: 1rem;
   border-radius: 6.25rem;
   padding: 0.5rem;
-  background: rgba(170, 114, 114, 0.9);
+  background: rgb(40, 40, 50);
   backdrop-filter: blur(10px);
+  
+}
+
+.shadow {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+img {
+  border-radius: 50%;
+  height: 44px;
+}
+
+.img_container{  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.with_conic_gradient {
+  justify-content: center;
+  height: 50px;
+  width: 50px;
+  border-width: 2px;
+  background-image: conic-gradient(#6F69AC,#95DAC1, #FFEBA1, #3DB2FF, #FD6F96, #6F69AC);
+  border-radius: 50%;
 }
