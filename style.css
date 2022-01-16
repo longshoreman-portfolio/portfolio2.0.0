@@ -64,6 +64,16 @@ img {
   align-items: center;
 }
 
+.img_container:hover{  
+  transform: rotate(360deg);
+  transition: all 0.3s ease-in-out 0s;
+}
+
+.img_container:hover img{
+  transform: rotate(-360deg);
+  transition: all 0.3s ease-in-out 0s;
+}
+
 .with_conic_gradient {
   justify-content: center;
   height: 50px;
