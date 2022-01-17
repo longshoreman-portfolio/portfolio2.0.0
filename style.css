@@ -42,11 +42,14 @@ canvas {
   gap: 0.5rem;
   width: 33.125rem;
   margin-top: 1rem;
+
+}
+
+.element_ {
   border-radius: 6.25rem;
   padding: 0.5rem;
-  background: rgb(40, 40, 50);
+  background: #28283266;
   backdrop-filter: blur(10px);
-  
 }
 
 .shadow {
@@ -106,7 +109,7 @@ a {
   font-family:  Helvetica, sans-serif;
   font-weight: 500;
   font-size: 1.5rem;
-  color: #444;
+  color: #666;
   -webkit-user-select: none;  /* Chrome all / Safari all */
   -moz-user-select: none;     /* Firefox all */
   -ms-user-select: none;      /* IE 10+ */
@@ -129,8 +132,6 @@ a {
   background-position: bottom left;
   background-size: 0% 3px;
   transition: background-size 500ms ease-in-out;
-
-  /* extra styling   */
   font-weight: var(--fw-bold);
 }
 
