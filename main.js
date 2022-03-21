@@ -108,6 +108,8 @@ smallCube.rotation.z = 20
 
 scene.add(smallCube)
 
+/** small change to test actoions */
+
 /** Cylinder helper */ 
 function cylinderWithroundedendge(radius, height, curve, smoothness) {
     const points = [];
