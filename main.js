@@ -4,6 +4,9 @@ import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+/** import loader for 3D models*/
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+
 const scene = new THREE.Scene()
 
 /** Camera */
@@ -150,6 +153,30 @@ var cubeDiractionY = false
 
 var shpereGrowing = true
 
+/** import icon example */ 
+const fbxLoader = new THREE.FBXLoader()
+
+fbxLoader.load('assets/models/bell.fbx',
+    (object) => {
+        object.traverse(function (child) {
+            if ((child).isMesh) {
+                // (child as THREE.Mesh).material = material
+                if ((child).material) {
+                    ((child).material).transparent = false
+                }
+            }
+        })
+        object.scale.set(.1, .1, .1)
+        scene.add(object)
+    },
+    (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    },
+    (error) => {
+        console.log(error)
+    }
+)
+
 function animateLoop() {
 
 
@@ -216,3 +243,6 @@ function onWindowResize(){
     window.location.reload()
     window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
 }
+
+
+
