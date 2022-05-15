@@ -154,18 +154,10 @@ var cubeDiractionY = false
 var shpereGrowing = true
 
 /** import icon example */ 
-const fbxLoader = new THREE.FBXLoader()
+const fbxLoader = new FBXLoader()
 
-fbxLoader.load('assets/models/bell.fbx',
+fbxLoader.load('assets/models/bell/bell.fbx',
     (object) => {
-        object.traverse(function (child) {
-            if ((child).isMesh) {
-                // (child as THREE.Mesh).material = material
-                if ((child).material) {
-                    ((child).material).transparent = false
-                }
-            }
-        })
         object.scale.set(.1, .1, .1)
         scene.add(object)
     },
