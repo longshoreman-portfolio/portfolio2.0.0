@@ -175,11 +175,14 @@ window.addEventListener('resize', () =>
     //controls.update()
     //Render
     //Call tick again on the next frame
+
+
     /** Animation loop */
     var cubeDiractionX = false
     var cubeDiractionY = false
 
     var shpereGrowing = true
+
     function animateLoop() {
 
 
@@ -296,14 +299,6 @@ function cylinderWithroundedendge(radius, height, curve, smoothness) {
 }
 
 
-/** Animation */ 
-/** Animation loop */
-var cubeDiractionX = false
-var cubeDiractionY = false
-
-var shpereGrowing = true
-
-
 
 
 
@@ -312,12 +307,4 @@ var shpereGrowing = true
 // TODO add about drop down
 // TODO avatar 
 // TODO add text working on 
-
-
-
-
-/** Resize for diffrent window sizes */
-
-
-
 
