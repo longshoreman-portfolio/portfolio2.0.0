@@ -126,21 +126,25 @@ scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple, poin
 
 
 /** Sizes */
+
+//  // TODO: This not a good approach. Try change the camera position instead of the scaling everything.
+/** Legacy code */
+/** 
 window.addEventListener( 'resize', onWindowResize, false );
-
 function onWindowResize(){
-    window.location.reload()
-    window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
+   window.location.reload()
+   window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
 }
-
-// TODO: This not a good approach. Try change the camera position instead of the scaling everything.
 scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25)
+*/
+
+
 
     //Update sizes
     //Update camera
     //Update renderer
-//TODO try this code for the resizing.
-/**
+
+// // TODO try this code for the resizing
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -160,7 +164,7 @@ window.addEventListener('resize', () =>
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
- */
+ 
 
 /** Camera */
     //Base camera
@@ -247,6 +251,8 @@ controls.enableZoom = false;
 
 
 
+//
+
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
 scene.background = new THREE.Color( 0x181822 )
@@ -260,4 +266,11 @@ scene.background = new THREE.Color( 0x181822 )
 
 
 
-//TODO: stop animation when the window is not in focus.
+// TODO: stop animation when the window is not in focus.
+
+
+/** backlog*/ 
+
+// TODO Create a horizontal scene
+// // TODO test the new resizing concept
+
