@@ -6,14 +6,21 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
-//import * as dat from 'dat.gui'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
+import * as dat from 'dat.gui'
 
 import {boxWithRoundedEdges, cylinderWithroundedendge} from './helpers/shaps.js'
+import { Mesh } from 'three'
 
 /** texture loader  */
 
 /** Debug */
-//const gui = new dat.GUI()
+const gui = new dat.GUI()
 
 
 /** Canvas */
@@ -93,9 +100,9 @@ scene.add( cylinder );
 /** import icon example */ 
 const fbxLoader = new FBXLoader()
 
-fbxLoader.load('assets/models/bell/bell.fbx',
+fbxLoader.load('assets/models/bell/3D.fbx',
     (object) => {
-        console.log(object.children.length)
+        // console.log('fbx obj:', object)
         object.scale.set(.1, .1, .1)
         scene.add(object)
     },
@@ -106,7 +113,6 @@ fbxLoader.load('assets/models/bell/bell.fbx',
         console.log(error)
     }
 )
-
 
 /** Lights */
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
@@ -122,7 +128,9 @@ const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
 pointLightPurple.position.set(30, 10, -20)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
-scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
+scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
+
+
 
 
 /** Sizes */
@@ -255,7 +263,7 @@ controls.enableZoom = false;
 
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
-scene.background = new THREE.Color( 0x181822 )
+scene.background = new THREE.Color( 0xffffcc )
 
 
 // TODO add centred nav bar 
@@ -272,5 +280,5 @@ scene.background = new THREE.Color( 0x181822 )
 /** backlog*/ 
 
 // TODO Create a horizontal scene
+// todo add GUI
 // // TODO test the new resizing concept
-
