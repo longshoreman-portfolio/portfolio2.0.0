@@ -6,7 +6,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
 import * as dat from 'dat.gui'
+
+import {boxWithRoundedEdges, cylinderWithroundedendge} from './helpers/shaps.js'
+import { Mesh } from 'three'
 
 /** texture loader  */
 
@@ -37,6 +46,7 @@ const geometryCube = new  boxWithRoundedEdges(10, 10, 10, 2, 6, 2)
 const geometrySmallCube = new  boxWithRoundedEdges(3, 3, 3, 0.5, 6, 2)
 
 //Cylinder
+const points = cylinderWithroundedendge(4,9,1,10)
 const geometryCylinder = new THREE.LatheGeometry(  points ,50)
 
 /** Materials */
@@ -90,9 +100,9 @@ scene.add( cylinder );
 /** import icon example */ 
 const fbxLoader = new FBXLoader()
 
-fbxLoader.load('assets/models/bell/bell.fbx',
+fbxLoader.load('assets/models/bell/3D.fbx',
     (object) => {
-        console.log(object.children.length)
+        // console.log('fbx obj:', object)
         object.scale.set(.1, .1, .1)
         scene.add(object)
     },
@@ -103,7 +113,6 @@ fbxLoader.load('assets/models/bell/bell.fbx',
         console.log(error)
     }
 )
-
 
 /** Lights */
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
@@ -119,21 +128,31 @@ const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
 pointLightPurple.position.set(30, 10, -20)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
-scene.add(ambientLight, pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
+scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
+
+
 
 
 /** Sizes */
-window.addEventListener( 'resize', onWindowResize, false );
 
+//  // TODO: This not a good approach. Try change the camera position instead of the scaling everything.
+/** Legacy code */
+/** 
+window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize(){
-    window.location.reload()
-    window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
+   window.location.reload()
+   window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
 }
+scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25)
+*/
+
+
+
     //Update sizes
     //Update camera
     //Update renderer
-//TODO try this code for the resizing.
-/**
+
+// // TODO try this code for the resizing
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -153,7 +172,7 @@ window.addEventListener('resize', () =>
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
- */
+ 
 
 /** Camera */
     //Base camera
@@ -167,7 +186,10 @@ window.addEventListener('resize', () =>
 /** Renderer */
 
 
-
+/** Interaction with shapes */ 
+// TODO: to be replaced by the raycaster
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableZoom = false;
 
 /** Animate */
     //Update objects
@@ -194,8 +216,8 @@ window.addEventListener('resize', () =>
         torus.rotation.z += 0.01
     
         /** Animate Cylinder */
-        lathe.rotation.x += 0.01
-        lathe.rotation.y += 0.03
+        cylinder.rotation.x += 0.01
+        cylinder.rotation.y += 0.03
     
         /** Animate cube */
         /** Cube translation */
@@ -236,75 +258,27 @@ window.addEventListener('resize', () =>
 
 
 
-/** Camera */
 
-
-/** Scene size for diffrent window sizes */
-scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25)
+//
 
 /** Background */
-scene.background = new THREE.Color( 0x181822 )
-
-/** Interaction with shapes */ 
-const controls = new OrbitControls(camera, renderer.domElement)
-controls.enableZoom = false;
+// TODO: Add a function to change the background color with the scroll. 
+scene.background = new THREE.Color( 0xffffcc )
 
 
-
-
-
-
-
-/** Cube helper */ 
-function boxWithRoundedEdges(width, height, depth, radius0, smoothness) {
-    let shape = new THREE.Shape();
-    let eps = 0.00001;
-    let radius = radius0 - eps;
-    shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
-    shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
-    shape.absarc(width - radius * 2, height - radius * 2, eps, Math.PI / 2, 0, true);
-    shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
-    let geometry = new THREE.ExtrudeBufferGeometry(shape, {
-        depth: depth - radius0 * 2,
-        bevelEnabled: true,
-        bevelSegments: smoothness * 2,
-        steps: 1,
-        bevelSize: radius,
-        bevelThickness: radius0,
-        curveSegments: smoothness
-    });
- 
-    geometry.center();
- 
-    return geometry;
-}
-
-/** Cylinder helper */ 
-function cylinderWithroundedendge(radius, height, curve, smoothness) {
-    const points = [];
-
-    points.push(new THREE.Vector2(0,  height / 2))
-
-    for (let i = 0 ; i <= smoothness ; i++) {
-        points.push( new THREE.Vector2( (curve / smoothness) * i + radius - curve , Math.sqrt(Math.pow(curve,2) - Math.pow((curve / smoothness) * i ,2)) + height / 2 - curve) )
-    }
-
-    for (let i = smoothness ; i >= 0 ; i--) {
-        points.push( new THREE.Vector2( (curve / smoothness) * i + radius - curve , - Math.sqrt(Math.pow(curve,2) - Math.pow((curve / smoothness) * i ,2)) - height / 2 + curve) )
-    }
-
-    points.push(new THREE.Vector2(0,-height / 2))
-
-    return points
-}
-
-
-
-
-
-
-// TODO add nav bar 
-// TODO add about drop down
+// TODO add centred nav bar 
+// TODO add about drop down full screen 
 // TODO avatar 
-// TODO add text working on 
+// TODO add text working on Page
 
+
+
+
+// TODO: stop animation when the window is not in focus.
+
+
+/** backlog*/ 
+
+// TODO Create a horizontal scene
+// todo add GUI
+// // TODO test the new resizing concept
