@@ -99,7 +99,7 @@ scene.add( cylinder );
 
 /** import icon example */ 
 const fbxLoader = new FBXLoader()
-
+/*
 fbxLoader.load('assets/models/bell/3D.fbx',
     (object) => {
         // console.log('fbx obj:', object)
@@ -113,14 +113,16 @@ fbxLoader.load('assets/models/bell/3D.fbx',
         console.log(error)
     }
 )
-
+*/
 const loader = new GLTFLoader()
 
 
 loader.load(
 	// resource URL
-	'assets/models/bell/3D.gltf',
-	// called when the resource is loaded
+	//'assets/models/bell/3D.gltf',
+	
+    'gs://zakaria-ben-jaoued.appspot.com/3D.gltf',
+    // called when the resource is loaded
 	function ( gltf ) {
         gltf.scene.scale.set(10,10,10)
 		scene.add( gltf.scene );
