@@ -114,6 +114,39 @@ fbxLoader.load('assets/models/bell/3D.fbx',
     }
 )
 
+const loader = new GLTFLoader()
+
+
+loader.load(
+	// resource URL
+	'assets/models/bell/3D.gltf',
+	// called when the resource is loaded
+	function ( gltf ) {
+        gltf.scene.scale.set(10,10,10)
+		scene.add( gltf.scene );
+
+		gltf.scene; // THREE.Group
+
+	},
+	// called while loading is progressing
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' );
+
+	}
+)
+
+
+
+
+
+
 /** Lights */
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
 pointLightWhite.position.set(10, 10, 10)
@@ -263,7 +296,7 @@ controls.enableZoom = false;
 
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
-scene.background = new THREE.Color( 0xffffcc )
+scene.background = new THREE.Color( 0x808080 )
 
 
 // TODO add centred nav bar 
