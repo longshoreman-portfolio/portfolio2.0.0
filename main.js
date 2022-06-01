@@ -339,7 +339,7 @@ const modelRef = ref(storage, '3D.gltf')
 
 
 
-getDownloadURL(ref(storage, 'images/stars.jpg'))
+getDownloadURL(modelRef)
   .then((url) => {
     // // `url` is the download URL for 'images/stars.jpg'
 
