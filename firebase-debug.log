@@ -1,0 +1,19 @@
+[debug] [2022-06-01T20:42:38.677Z] ----------------------------------------------------------------------
+[debug] [2022-06-01T20:42:38.679Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2022-06-01T20:42:38.679Z] CLI Version:   10.4.0
+[debug] [2022-06-01T20:42:38.679Z] Platform:      win32
+[debug] [2022-06-01T20:42:38.680Z] Node Version:  v16.13.2
+[debug] [2022-06-01T20:42:38.724Z] Time:          Wed Jun 01 2022 21:42:38 GMT+0100 (GMT+01:00)
+[debug] [2022-06-01T20:42:38.724Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-06-01T20:42:38.757Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2022-06-01T20:42:38.879Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-06-01T20:42:38.879Z] > authorizing via signed-in user (zakaria.benjawed@gmail.com)
+[info] i  emulators: Starting emulators: firestore, hosting {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: firestore, hosting"}}
+[debug] [2022-06-01T20:42:38.896Z] [hub] writing locator at C:\Users\User\AppData\Local\Temp\hub-zakaria-ben-jaoued.json
+[info] i  firestore: downloading cloud-firestore-emulator-v1.13.1.jar... {"metadata":{"emulator":{"name":"firestore"},"message":"downloading cloud-firestore-emulator-v1.13.1.jar..."}}
+[debug] [2022-06-01T20:42:39.169Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.13.1.jar 
+[debug] [2022-06-01T20:42:39.919Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2022-06-01T20:42:39.919Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2022-06-01T20:42:40.296Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.13.1.jar 200
+[debug] [2022-06-01T20:42:40.296Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.13.1.jar [stream]
