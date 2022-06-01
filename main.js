@@ -303,7 +303,7 @@ controls.enableZoom = false;
 const storage = getStorage()
 const modelRef = ref(storage, '3D.gltf')
 
-getDownloadURL(starsRef)
+getDownloadURL(modelRef)
 
   .then((url) => {
     // Insert url into an <img> tag to "download"
