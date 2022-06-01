@@ -14,6 +14,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import * as dat from 'dat.gui'
 
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
 import {boxWithRoundedEdges, cylinderWithroundedendge} from './helpers/shaps.js'
 import { Mesh } from 'three'
 
@@ -117,32 +119,36 @@ fbxLoader.load('assets/models/bell/3D.fbx',
 const loader = new GLTFLoader()
 
 
-loader.load(
-	// resource URL
-	//'assets/models/bell/3D.gltf',
-	
-    'gs://zakaria-ben-jaoued.appspot.com/3D.gltf',
-    // called when the resource is loaded
-	function ( gltf ) {
-        gltf.scene.scale.set(10,10,10)
-		scene.add( gltf.scene );
+gtlfLoadHelper = (loader, url) => {
+    loader.load(
+        // resource URL
+        //'assets/models/bell/3D.gltf',
+        // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
+        url,
+        // called when the resource is loaded
+        function ( gltf ) {
+            gltf.scene.scale.set(10,10,10)
+            scene.add( gltf.scene );
+    
+            gltf.scene; // THREE.Group
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    )
+}
 
-		gltf.scene; // THREE.Group
 
-	},
-	// called while loading is progressing
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
-	}
-)
 
 
 
@@ -294,7 +300,43 @@ controls.enableZoom = false;
 
 
 
-//
+const storage = getStorage()
+const modelRef = ref(storage, '3D.gltf')
+
+getDownloadURL(starsRef)
+
+  .then((url) => {
+    // Insert url into an <img> tag to "download"
+    gtlfLoadHelper(loader, url)
+  })
+
+
+  .catch((error) => {
+    // A full list of error codes is available at
+    // https://firebase.google.com/docs/storage/web/handle-errors
+    switch (error.code) {
+      case 'storage/object-not-found':
+        // File doesn't exist
+        console.error('File does not exist')
+        break;
+      case 'storage/unauthorized':
+        // User doesn't have permission to access the object
+        console.error('User does not have permission to access the object')
+        break;
+      case 'storage/canceled':
+        // User canceled the upload
+        console.error('User canceled the upload')
+        break;
+
+      // ...
+      case 'storage/unknown':
+        // Unknown error occurred, inspect the server response
+        console.error('Unknown error occurred, inspect the server response')
+        break;
+    }
+  })
+
+    
 
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
