@@ -6,10 +6,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
-
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import * as dat from 'dat.gui'
@@ -17,7 +13,9 @@ import * as dat from 'dat.gui'
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 import {boxWithRoundedEdges, cylinderWithroundedendge} from './helpers/shaps.js'
-import { Mesh } from 'three'
+
+import { initializeApp } from 'firebase/app';
+
 
 /** texture loader  */
 
@@ -300,57 +298,58 @@ scene.background = new THREE.Color( 0x808080 )
 
 
 
-const storage = getStorage()
-const modelRef = ref(storage, '3D.gltf')
+
+loader.load(
+    // resource URL
+    //'assets/models/bell/3D.gltf',
+    // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
+    url,
+    // called when the resource is loaded
+    function ( gltf ) {
+        gltf.scene.scale.set(10,10,10)
+        scene.add( gltf.scene );
+
+        gltf.scene; // THREE.Group
+
+    },
+    // called while loading is progressing
+    function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+    },
+    // called when loading has errors
+    function ( error ) {
+
+        console.log( 'An error happened' );
+
+    }
+)
+    
 
 
+const firebaseApp = initializeApp(process.env.firebaseConfig)
 
-getDownloadURL(modelRef)
+const myStorage = firebaseApp.storage()
+
+const myModelRef = myStorage.ref(myStorage, '3D.gltf')
+
+
+getDownloadURL(myModelRef)
+
   .then((url) => {
-    // // `url` is the download URL for 'images/stars.jpg'
+    // `url` is the download URL for 'images/stars.jpg'
 
-    // // This can be downloaded directly:
-    // const xhr = new XMLHttpRequest();
-    // xhr.responseType = 'blob';
-    // xhr.onload = (event) => {
-    //   const blob = xhr.response;
-    // };
-    // xhr.open('GET', url);
-    // xhr.send();
-    const loader = new GLTFLoader()
+    // This can be downloaded directly:
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = (event) => {
+      const blob = xhr.response;
+    };
+    xhr.open('GET', url);
+    xhr.send();
 
-    loader.load(
-        // resource URL
-        //'assets/models/bell/3D.gltf',
-        // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
-        url,
-        // called when the resource is loaded
-        function ( gltf ) {
-            gltf.scene.scale.set(10,10,10)
-            scene.add( gltf.scene );
-    
-            gltf.scene; // THREE.Group
-    
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
-        },
-        // called when loading has errors
-        function ( error ) {
-    
-            console.log( 'An error happened' );
-    
-        }
-    )
-    
-
-
-
-    
-
+    console.log(url)
   })
   .catch((error) => {
     // Handle any errors
