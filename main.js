@@ -116,37 +116,9 @@ fbxLoader.load('assets/models/bell/3D.fbx',
     }
 )
 */
-const loader = new GLTFLoader()
 
 
-gtlfLoadHelper = (loader, url) => {
-    loader.load(
-        // resource URL
-        //'assets/models/bell/3D.gltf',
-        // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
-        url,
-        // called when the resource is loaded
-        function ( gltf ) {
-            gltf.scene.scale.set(10,10,10)
-            scene.add( gltf.scene );
-    
-            gltf.scene; // THREE.Group
-    
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
-        },
-        // called when loading has errors
-        function ( error ) {
-    
-            console.log( 'An error happened' );
-    
-        }
-    )
-}
+
 
 
 
@@ -300,10 +272,8 @@ controls.enableZoom = false;
 
 
 
-const storage = getStorage()
-const modelRef = ref(storage, '3D.gltf')
 
-getDownloadURL(modelRef)
+getDownloadURL(starsRef)
 
   .then((url) => {
     // Insert url into an <img> tag to "download"
@@ -359,3 +329,63 @@ scene.background = new THREE.Color( 0x808080 )
 // TODO Create a horizontal scene
 // todo add GUI
 // // TODO test the new resizing concept
+
+
+
+
+
+const storage = getStorage()
+const modelRef = ref(storage, '3D.gltf')
+
+
+
+getDownloadURL(ref(storage, 'images/stars.jpg'))
+  .then((url) => {
+    // // `url` is the download URL for 'images/stars.jpg'
+
+    // // This can be downloaded directly:
+    // const xhr = new XMLHttpRequest();
+    // xhr.responseType = 'blob';
+    // xhr.onload = (event) => {
+    //   const blob = xhr.response;
+    // };
+    // xhr.open('GET', url);
+    // xhr.send();
+    const loader = new GLTFLoader()
+
+    loader.load(
+        // resource URL
+        //'assets/models/bell/3D.gltf',
+        // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
+        url,
+        // called when the resource is loaded
+        function ( gltf ) {
+            gltf.scene.scale.set(10,10,10)
+            scene.add( gltf.scene );
+    
+            gltf.scene; // THREE.Group
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    )
+    
+
+
+
+    
+
+  })
+  .catch((error) => {
+    // Handle any errors
+  });
