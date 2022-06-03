@@ -6,13 +6,13 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
 
 import * as dat from 'dat.gui'
 
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
 
-import {boxWithRoundedEdges, cylinderWithroundedendge} from './helpers/shaps.js'
+import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
 import { initializeApp } from 'firebase/app';
 
@@ -294,46 +294,53 @@ scene.background = new THREE.Color( 0x808080 )
 // todo add GUI
 // // TODO test the new resizing concept
 
-
-
-
-
-
-loader.load(
-    // resource URL
-    //'assets/models/bell/3D.gltf',
-    // todo: create a reference to the model with getStorage method URL : https://firebase.google.com/docs/storage/web/download-files#web-version-9
-    url,
-    // called when the resource is loaded
-    function ( gltf ) {
-        gltf.scene.scale.set(10,10,10)
-        scene.add( gltf.scene );
-
-        gltf.scene; // THREE.Group
-
-    },
-    // called while loading is progressing
-    function ( xhr ) {
-
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-    },
-    // called when loading has errors
-    function ( error ) {
-
-        console.log( 'An error happened' );
-
-    }
-)
+const myLoader = (url) => {
+    const fbxLoader = new FBXLoader()
+    
+    fbxLoader.load(url,
+        (object) => {
+            // console.log('fbx obj:', object)
+            object.scale.set(.1, .1, .1)
+            scene.add(object)
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        },
+        (error) => {
+            console.log(error)
+        }
+    )
     
 
+    
+}
 
-const firebaseApp = initializeApp(process.env.firebaseConfig)
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-const myStorage = firebaseApp.storage()
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDNM6e0lq7bh5UUh9qxJ_CTF9hZVfIoIkA",
+  authDomain: "my-storage-testing.firebaseapp.com",
+  projectId: "my-storage-testing",
+  storageBucket: "zakaria-ben-jaoued.appspot.com",
+  messagingSenderId: "42915064040",
+  appId: "1:42915064040:web:1854d9c3c4c41be6c0415d",
+  measurementId: "G-JQTQVZCZ8X"
+};
 
-const myModelRef = myStorage.ref(myStorage, '3D.gltf')
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
 
+
+
+const myStorage = getStorage(firebaseApp)
+connectStorageEmulator(myStorage, 'localhost', 9199)
+const myModelRef = ref( myStorage, '3D.fbx')
+
+
+console.log(myModelRef)
 
 getDownloadURL(myModelRef)
 
@@ -350,7 +357,16 @@ getDownloadURL(myModelRef)
     xhr.send();
 
     console.log(url)
+    
+
+    myLoader(url)
+
   })
   .catch((error) => {
+    console.log('error:',error)
     // Handle any errors
+    //console.error('err')
   });
+
+
+
