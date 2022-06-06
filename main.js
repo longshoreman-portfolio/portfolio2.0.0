@@ -336,7 +336,35 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 
 const myStorage = getStorage(firebaseApp)
-connectStorageEmulator(myStorage, 'localhost', 9199)
+
+// todo : make conditions for the different envs (dev, prod, emulator)
+
+
+// we can change this to be function that takes the url as an argument
+
+let targetEnverment = () => {
+    process.env.NODE_ENV === "production" 
+        ?   (location.hostname === "localhost") 
+            ?   "emulator" 
+            :   process.env.NODE_ENV 
+        :   process.env.NODE_ENV 
+}
+
+let storageURL = () => { }
+
+
+let loadModel = (targetEnverment, storageURL) => {
+    targetEnverment() === "production" 
+        ? "load from production storage"
+        : null
+    targetEnverment() === "emulator"
+        ? "load from emulator storage"
+        : null
+    targetEnverment() === "development" 
+        ? "load from directory"
+        : null
+}
+    
 const myModelRef = ref( myStorage, '3D.fbx')
 
 
@@ -356,17 +384,9 @@ getDownloadURL(myModelRef)
     xhr.open('GET', url);
     xhr.send();
 
-    console.log(url)
-    
-
     myLoader(url)
 
   })
   .catch((error) => {
     console.log('error:',error)
-    // Handle any errors
-    //console.error('err')
   });
-
-
-
