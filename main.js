@@ -309,10 +309,7 @@ const myLoader = (url) => {
         (error) => {
             console.log(error)
         }
-    )
-    
-
-    
+    )    
 }
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -331,10 +328,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+
 const firebaseApp = initializeApp(firebaseConfig);
-
-
-
 const myStorage = getStorage(firebaseApp)
 
 // todo : make conditions for the different envs (dev, prod, emulator)
@@ -350,19 +345,20 @@ let targetEnverment = () => {
         :   process.env.NODE_ENV 
 }
 
-let storageURL = () => { }
+let storageURL = (links) => { 
+    targetEnverment() === "production" 
+        ? links.production //production storage
+        : null
+    targetEnverment() === "emulator"
+        ? links.emulator //emulator storage
+        : null
+    targetEnverment() === "development" 
+        ? links.development //directory storage
+        : null
+}
 
 
 let loadModel = (targetEnverment, storageURL) => {
-    targetEnverment() === "production" 
-        ? "load from production storage"
-        : null
-    targetEnverment() === "emulator"
-        ? "load from emulator storage"
-        : null
-    targetEnverment() === "development" 
-        ? "load from directory"
-        : null
 }
     
 const myModelRef = ref( myStorage, '3D.fbx')
