@@ -295,21 +295,7 @@ scene.background = new THREE.Color( 0x808080 )
 // // TODO test the new resizing concept
 
 const myLoader = (url) => {
-    const fbxLoader = new FBXLoader()
-    
-    fbxLoader.load(url,
-        (object) => {
-            // console.log('fbx obj:', object)
-            object.scale.set(.1, .1, .1)
-            scene.add(object)
-        },
-        (xhr) => {
-            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-        },
-        (error) => {
-            console.log(error)
-        }
-    )    
+  
 }
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -321,16 +307,23 @@ const firebaseConfig = {
   apiKey: "AIzaSyDNM6e0lq7bh5UUh9qxJ_CTF9hZVfIoIkA",
   authDomain: "my-storage-testing.firebaseapp.com",
   projectId: "my-storage-testing",
-  storageBucket: "zakaria-ben-jaoued.appspot.com",
+  storageBucket: "gs://zakaria-ben-jaoued.appspot.com/",
   messagingSenderId: "42915064040",
   appId: "1:42915064040:web:1854d9c3c4c41be6c0415d",
   measurementId: "G-JQTQVZCZ8X"
-};
+}
 
 // Initialize Firebase
 
-const firebaseApp = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig)
 const myStorage = getStorage(firebaseApp)
+
+const myModelRef = ref( myStorage, 'letter.fbx')
+connectStorageEmulator( myModelRef, "localhost", 9199)
+
+
+console.log(myModelRef)
+
 
 // todo : make conditions for the different envs (dev, prod, emulator)
 
@@ -338,51 +331,79 @@ const myStorage = getStorage(firebaseApp)
 // we can change this to be function that takes the url as an argument
 
 let targetEnverment = () => {
-    process.env.NODE_ENV === "production" 
-        ?   (location.hostname === "localhost") 
-            ?   "emulator" 
-            :   process.env.NODE_ENV 
-        :   process.env.NODE_ENV 
+    return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
+        :   process.env.NODE_ENV
 }
 
-let storageURL = (links) => { 
-    targetEnverment() === "production" 
-        ? links.production //production storage
-        : null
-    targetEnverment() === "emulator"
-        ? links.emulator //emulator storage
-        : null
-    targetEnverment() === "development" 
-        ? links.development //directory storage
-        : null
+// URLs from firestore
+let storageURL = ( URLs, targetEnverment ) => { 
+    return  targetEnverment() === "production" ? URLs.production //production storage
+        :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
+        :   targetEnverment() === "development" ? URLs.development //directory storage
+        :   console.error("Error: no target enverment found")
 }
 
+// model = {name, routes} form firestore
+// let loadModel = ( URLs, storageURL, targetEnverment, model ) => {
+//     const fbxLoader = new FBXLoader()
 
-let loadModel = (targetEnverment, storageURL) => {
-}
-    
-const myModelRef = ref( myStorage, '3D.fbx')
+//     fbxLoader.load( storageURL( URLs, targetEnverment ) +  model.name + ".fbx", 
+//         (object) => {
+//             object.scale.set(.1, .1, .1)
+//             scene.add(object)
+//         },
+//         (xhr) => {
+//             console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+//         },
+//         (error) => {
+//             console.log(error)
+//         }
+//     )  
+// }
 
 
-console.log(myModelRef)
+
+
 
 getDownloadURL(myModelRef)
+    .then((url) => {
 
-  .then((url) => {
-    // `url` is the download URL for 'images/stars.jpg'
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+            const blob = xhr.response;
+        };
+        xhr.open('GET', url);
+        xhr.send();
 
-    // This can be downloaded directly:
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
-    xhr.onload = (event) => {
-      const blob = xhr.response;
-    };
-    xhr.open('GET', url);
-    xhr.send();
+        myLoader(url)
 
-    myLoader(url)
+    })
+    .catch((error) => {
+        console.log('error:',error)
+    });
 
-  })
-  .catch((error) => {
-    console.log('error:',error)
-  });
+
+
+let myModelsInfoMoch = [
+    {name: "letter"},
+    {name: "HTML"},
+]
+
+// TODO new data schema collection { name: "contact",  models [ array of modal gonna be used in contact component] } all files gonna be in the same folder 
+ 
+
+
+
+let URLs = {
+    production: "https://storage.googleapis.com/zakaria-ben-jaoued.appspot.com/",
+    emulator: "http://localhost:9199/assets/",
+    development: "assets/",
+}
+
+
+console.log("targetEnverment:", targetEnverment()) 
+
+loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[0] )
+loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[1] )
+// TODO refactor : abstract the env checking process to a function and move it to a diff drectory (env || config)
