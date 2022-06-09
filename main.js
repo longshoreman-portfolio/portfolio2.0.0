@@ -305,9 +305,9 @@ const myLoader = (url) => {
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDNM6e0lq7bh5UUh9qxJ_CTF9hZVfIoIkA",
-  authDomain: "my-storage-testing.firebaseapp.com",
-  projectId: "my-storage-testing",
-  storageBucket: "gs://zakaria-ben-jaoued.appspot.com/",
+  authDomain: "zakaria-ben-jaoued.firebaseapp.com",
+  projectId: "zakaria-ben-jaoued",
+  storageBucket: "gs://zakaria-ben-jaoued.appspot.com",
   messagingSenderId: "42915064040",
   appId: "1:42915064040:web:1854d9c3c4c41be6c0415d",
   measurementId: "G-JQTQVZCZ8X"
@@ -315,14 +315,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 
+
 const firebaseApp = initializeApp(firebaseConfig)
 const myStorage = getStorage(firebaseApp)
-
 const myModelRef = ref( myStorage, 'letter.fbx')
-connectStorageEmulator( myModelRef, "localhost", 9199)
 
+
+let targetEnverment = () => {
+    return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
+        :   process.env.NODE_ENV
+}
 
 console.log(myModelRef)
+
 
 
 // todo : make conditions for the different envs (dev, prod, emulator)
@@ -330,12 +335,8 @@ console.log(myModelRef)
 
 // we can change this to be function that takes the url as an argument
 
-let targetEnverment = () => {
-    return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
-        :   process.env.NODE_ENV
-}
 
-// URLs from firestore
+// TODO remove this finction 
 let storageURL = ( URLs, targetEnverment ) => { 
     return  targetEnverment() === "production" ? URLs.production //production storage
         :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
@@ -343,47 +344,36 @@ let storageURL = ( URLs, targetEnverment ) => {
         :   console.error("Error: no target enverment found")
 }
 
-// model = {name, routes} form firestore
-// let loadModel = ( URLs, storageURL, targetEnverment, model ) => {
-//     const fbxLoader = new FBXLoader()
-
-//     fbxLoader.load( storageURL( URLs, targetEnverment ) +  model.name + ".fbx", 
-//         (object) => {
-//             object.scale.set(.1, .1, .1)
-//             scene.add(object)
-//         },
-//         (xhr) => {
-//             console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-//         },
-//         (error) => {
-//             console.log(error)
-//         }
-//     )  
-// }
 
 
 
+let loadModel = ( url ) => {
+    const fbxLoader = new FBXLoader()
+
+    fbxLoader.load( url, 
+        (object) => {
+            object.scale.set(.1, .1, .1)
+            scene.add(object)
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        },
+        (error) => {
+            console.log(error)
+        }
+    )  
+}
 
 
-getDownloadURL(myModelRef)
-    .then((url) => {
-
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.onload = (event) => {
-            const blob = xhr.response;
-        };
-        xhr.open('GET', url);
-        xhr.send();
-
-        myLoader(url)
-
-    })
-    .catch((error) => {
-        console.log('error:',error)
-    });
-
-
+const downLoadModel = (myModelRef , loadModel) => {
+    getDownloadURL(myModelRef)
+        .then((url) => {
+            loadModel(url)
+        })
+        .catch((error) => {
+            console.error('myError:',error)
+        });
+}
 
 let myModelsInfoMoch = [
     {name: "letter"},
@@ -397,13 +387,32 @@ let myModelsInfoMoch = [
 
 let URLs = {
     production: "https://storage.googleapis.com/zakaria-ben-jaoued.appspot.com/",
-    emulator: "http://localhost:9199/assets/",
+    emulator: "http://localhost:9199/",
     development: "assets/",
 }
 
 
 console.log("targetEnverment:", targetEnverment()) 
 
-loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[0] )
-loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[1] )
-// TODO refactor : abstract the env checking process to a function and move it to a diff drectory (env || config)
+//loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[0] )
+//loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[1] )
+// TODO refactor : abstract the env checking process to a function and move it to a diff drectory (env || config)S
+
+
+
+
+
+if (targetEnverment() === "emulator") {
+    connectStorageEmulator( myStorage, "localhost", 9199)
+    downLoadModel(myModelRef,loadModel)
+}
+
+if (targetEnverment() === "development") {
+    let url = storageURL( URLs, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+    loadModel( url )   
+}
+
+
+if ( targetEnverment() === "production" ) {
+    downLoadModel(myModelRef,loadModel)
+}
