@@ -6,15 +6,20 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+import { storageURL, getURLAndDownloadModel } from './helpers/model'    
 
 
 import * as dat from 'dat.gui'
 
-import { getStorage, ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
+import {  ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
+
+import { app , appStorage }  from './firebase-config.js'
+
 
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
-import { initializeApp } from 'firebase/app';
+import { routes } from './router'
+
 
 
 /** texture loader  */
@@ -98,27 +103,6 @@ cylinder.scale.set(1, 1, 1);
 scene.add( cylinder );
 
 /** import icon example */ 
-const fbxLoader = new FBXLoader()
-/*
-fbxLoader.load('assets/models/bell/3D.fbx',
-    (object) => {
-        // console.log('fbx obj:', object)
-        object.scale.set(.1, .1, .1)
-        scene.add(object)
-    },
-    (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-    },
-    (error) => {
-        console.log(error)
-    }
-)
-*/
-
-
-
-
-
 
 
 
@@ -291,42 +275,25 @@ scene.background = new THREE.Color( 0x808080 )
 /** backlog*/ 
 
 // TODO Create a horizontal scene
-// todo add GUI
+// // todo add GUI
+// todo use gui
 // // TODO test the new resizing concept
 
-const myLoader = (url) => {
-  
-}
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDNM6e0lq7bh5UUh9qxJ_CTF9hZVfIoIkA",
-  authDomain: "zakaria-ben-jaoued.firebaseapp.com",
-  projectId: "zakaria-ben-jaoued",
-  storageBucket: "gs://zakaria-ben-jaoued.appspot.com",
-  messagingSenderId: "42915064040",
-  appId: "1:42915064040:web:1854d9c3c4c41be6c0415d",
-  measurementId: "G-JQTQVZCZ8X"
-}
-
-// Initialize Firebase
+// // TODO: Add SDKs for Firebase products that you want to use
 
 
-const firebaseApp = initializeApp(firebaseConfig)
-const myStorage = getStorage(firebaseApp)
-const myModelRef = ref( myStorage, 'letter.fbx')
 
+
+const fbxLoader = new FBXLoader()
+
+const myModelRef = ref( appStorage, 'letter.fbx')
 
 let targetEnverment = () => {
     return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
         :   process.env.NODE_ENV
 }
 
-console.log(myModelRef)
 
 
 
@@ -337,19 +304,8 @@ console.log(myModelRef)
 
 
 // TODO remove this finction 
-let storageURL = ( URLs, targetEnverment ) => { 
-    return  targetEnverment() === "production" ? URLs.production //production storage
-        :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
-        :   targetEnverment() === "development" ? URLs.development //directory storage
-        :   console.error("Error: no target enverment found")
-}
 
-
-
-
-let loadModel = ( url ) => {
-    const fbxLoader = new FBXLoader()
-
+const loadModel = ( url ) => {
     fbxLoader.load( url, 
         (object) => {
             object.scale.set(.1, .1, .1)
@@ -359,75 +315,13 @@ let loadModel = ( url ) => {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
         },
         (error) => {
-            console.log(error)
+            console.log('error:', error)
         }
     )  
 }
 
 
-const downLoadModel = (myModelRef , loadModel) => {
-    getDownloadURL(myModelRef)
-        .then((url) => {
-            loadModel(url)
-        })
-        .catch((error) => {
-            console.error('myError:',error)
-            // A full list of error codes is available at
-            // https://firebase.google.com/docs/storage/web/handle-errors
-            switch (error.code) {
-                case 'storage/unknown':
-                    console.error('An unknown error occurred.')
-                    break;
-                case 'storage/object-not-found':
-                    console.error('No object exists at the desired reference.')
-                    break;
-                case 'bucket-not-found':
-                    console.error('No bucket is configured for Cloud Storage')
-                    break;
-                case 'storage/project-not-found':
-                    console.error('No project is configured for Cloud Storage')
-                    break;
-                case 'storage/quota-exceeded':
-                    console.error("Quota on your Cloud Storage bucket has been exceeded. If you're on the no-cost tier, upgrade to a paid plan. If you're on a paid plan, reach out to Firebase support.")
-                    break;
-                case 'storage/unauthenticated':
-                    console.error('User is unauthenticated, please authenticate and try again.')
-                    break;
-                case 'storage/unauthorized':
-                    console.error('User is not authorized to perform the desired action, check your security rules to ensure they are correct.')
-                    break;
-                case 'storage/retry-limit-exceeded':
-                    console.error('	The maximum time limit on an operation (upload, download, delete, etc.) has been excceded. Try uploading again.')
-                    break;
-                case 'storage/invalid-checksum':
-                    console.error('	File on the client does not match the checksum of the file received by the server. Try uploading again.')
-                    break;
-                case 'storage/canceled':
-                    console.error('	User canceled the operation.')
-                    break;
-                case 'storage/invalid-event-name':
-                    console.error('Invalid event name provided. Must be one of [`running`, `progress`, `pause`].')
-                    break;
-                case 'storage/invalid-url':
-                    console.error('Invalid URL provided to refFromURL(). Must be of the form: gs://bucket/object or https://firebasestorage.googleapis.com/v0/b/bucket/o/object?token=<TOKEN>.')
-                    break;
-                case 'storage/invalid-argument':
-                    console.error('	The argument passed to put() must be `File`, `Blob`, or `UInt8` Array. The argument passed to putString() must be a raw, `Base64`, or `Base64URL` string.')
-                    break;
-                case 'storage/no-default-bucket':
-                    console.error("No bucket has been set in your config's storageBucket property.")
-                    break;
-                case 'storage/cannot-slice-blob':
-                    console.error("Commonly occurs when the local file has changed (deleted, saved again, etc.). Try uploading again after verifying that the file hasn't changed.")
-                    break;
-                case 'storage/server-file-wrong-size':
-                    console.error("	File on the client does not match the size of the file recieved by the server. Try uploading again.")
-                    break;
-            }
-        })
-}
-
-let myModelsInfoMoch = [
+const myModelsInfoMoch = [
     {name: "letter"},
     {name: "HTML"},
 ]
@@ -437,11 +331,6 @@ let myModelsInfoMoch = [
 
 
 
-let URLs = {
-    production: "https://storage.googleapis.com/zakaria-ben-jaoued.appspot.com/",
-    emulator: "http://localhost:9199/",
-    development: "assets/",
-}
 
 
 console.log("targetEnverment:", targetEnverment()) 
@@ -454,17 +343,18 @@ console.log("targetEnverment:", targetEnverment())
 
 
 
+
 if (targetEnverment() === "emulator") {
     connectStorageEmulator( myStorage, "localhost", 9199)
-    downLoadModel(myModelRef,loadModel)
+    getURLAndDownloadModel(myModelRef,loadModel)
 }
 
 if (targetEnverment() === "development") {
-    let url = storageURL( URLs, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+    const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
     loadModel( url )   
 }
 
 
 if ( targetEnverment() === "production" ) {
-    downLoadModel(myModelRef,loadModel)
+    getURLAndDownloadModel(myModelRef,loadModel)
 }
