@@ -80,6 +80,12 @@ function addModelToScene( object, scene ) {
 }
 
 
+function setScale( object, scale ) {
+    return object.scale.set(scale, scale, scale)
+}
+
+
+
 async function loadModel ( url ) {
     const fbxLoader = new FBXLoader()
     const result = await fbxLoader.loadAsync( url, 
