@@ -81,13 +81,18 @@ const getURLAndDownloadModel = (myModelRef , loadModel) => {
 
 function addModelToScene( object, scene ) {
 
-    const width =window.innerWidth
+    const width = window.innerWidth
     const w = parseInt(width, 10)
     let x = w  * 0.04
+
+    const height = window.innerHeight
+    const h = parseInt(height, 10)
+    let z = h * 0.04
+
     console.log(x)
     console.log(width/2)
     object.scale.set(.1, .1, .1)
-    object.position.set( x , 0, 0)
+    object.position.set( x , z, 0)
     scene.add(object)
 }
 
