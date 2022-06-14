@@ -79,11 +79,13 @@ function addModelToScene( object, scene ) {
     scene.add(object)
 }
 
-
 function setScale( object, scale ) {
     return object.scale.set(scale, scale, scale)
 }
 
+function setPosition( object, position ) {
+    return object.position.set(position.x, position.y, position.z)
+}
 
 
 async function loadModel ( url ) {
