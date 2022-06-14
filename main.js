@@ -241,8 +241,8 @@ controls.enableZoom = false;
         sphere.scale.x >= 1.4 ? shpereGrowing = false : null
         sphere.scale.x <= 0.6 ? shpereGrowing = true : null
     
-        scene.rotation.y += 0.003
-        scene.rotation.x += 0.003
+        // scene.rotation.y += 0.003
+        // scene.rotation.x += 0.003
         
         controls.update()
     
@@ -357,8 +357,6 @@ if (targetEnverment() === "emulator") {
 if (targetEnverment() === "development") {
     const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
     addModelToScene(  await loadModel(url) ,scene )
-    
-    console.log('this is my obj 2 ', await loadModel(url))
 }
 
 
@@ -376,13 +374,12 @@ if ( targetEnverment() === "production" ) {
 // todo: craete a function that returns a random position
 // todo: ditch the random position and use only three or four models that turns => so create a function that retern positions 
 
-function positions(numberOfmodels){
 
-}
 
-// todo: function to loadobject 
-// todo: function to add object to the scene
-// todo: function for the positon 
+// // todo: function to loadobject 
+// // todo: function to add object to the scene
+// // todo: function for the positon 
+// // todo: function to scale models
 
 
 

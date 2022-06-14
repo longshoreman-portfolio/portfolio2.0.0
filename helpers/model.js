@@ -71,20 +71,33 @@ const getURLAndDownloadModel = (myModelRef , loadModel) => {
 }
 
 
+
+
 //todo to be used later in the new algo 
 //todo add position as argument
+//todo make it proprtional to the screen size
+//todo make it proprtional to camera distance || position
+
 
 function addModelToScene( object, scene ) {
+
+    const width =window.innerWidth
+    const w = parseInt(width, 10)
+    let x = w  * 0.04
+    console.log(x)
+    console.log(width/2)
     object.scale.set(.1, .1, .1)
+    object.position.set( x , 0, 0)
     scene.add(object)
 }
-
 
 function setScale( object, scale ) {
     return object.scale.set(scale, scale, scale)
 }
 
-
+function setPosition( object, position ) {
+    return object.position.set(position.x, position.y, position.z)
+}
 
 async function loadModel ( url ) {
     const fbxLoader = new FBXLoader()
@@ -163,5 +176,35 @@ async function fetchDownloadURL(ref) {
         })
 }
 
+function landingPageRandmoPositions() {
+    return [
+        {x: -1, y: -1, z: -1},
+        {x: 1, y: -1, z: -1},
+        {x: -1, y: 1, z: -1},
+    ]
+}
 
-export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene }
+function randomInRange(start,end){
+    return Math.floor(Math.random() * (end - start + 1) + start);
+}
+
+function objectRandomPositionInLandingPage(randomInRange) { 
+    
+
+    
+    return {
+        x: randomInRange(-10, 10),
+        y: randomInRange(-10, 10),
+        z: randomInRange(-10, 10)
+    }
+}
+
+// todo: find relations between three js scale and window.innerWidth and window.innerHeight
+
+
+//console.log(randomInRange(10,20))
+
+
+
+
+export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene, setScale, setPosition }
