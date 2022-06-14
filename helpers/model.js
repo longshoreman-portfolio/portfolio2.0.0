@@ -1,4 +1,6 @@
-import {   getDownloadURL } from "firebase/storage";
+import { getDownloadURL } from "firebase/storage";
+
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 const storageURL = ( URLs, targetEnverment ) => { 
     return  targetEnverment() === "production" ? URLs.production //production storage
@@ -68,6 +70,33 @@ const getURLAndDownloadModel = (myModelRef , loadModel) => {
         })
 }
 
+
+//todo to be used later in the new algo 
+//todo add position as argument
+
+function addModelToScene( object, scene ) {
+    object.scale.set(.1, .1, .1)
+    scene.add(object)
+}
+
+
+async function loadModel ( url ) {
+    const fbxLoader = new FBXLoader()
+    const result = await fbxLoader.loadAsync( url, 
+        (object) => {
+            return object
+        },
+        (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        },
+        (error) => {
+            console.log('error:', error)
+        }
+    )  
+    return result
+}
+
+
 async function fetchDownloadURL(ref) {
     return await getDownloadURL(ref)
         .then((url) => {
@@ -129,4 +158,4 @@ async function fetchDownloadURL(ref) {
 }
 
 
-export { storageURL, getURLAndDownloadModel, fetchDownloadURL }
+export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene }

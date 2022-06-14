@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
-import { storageURL, getURLAndDownloadModel } from './helpers/model'    
+import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
 
 import * as dat from 'dat.gui'
@@ -15,10 +15,10 @@ import {  ref, getDownloadURL , connectStorageEmulator } from "firebase/storage"
 
 import { app , appStorage }  from './firebase-config.js'
 
-
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
 import { routes } from './router'
+import { async } from '@firebase/util'
 
 
 
@@ -266,20 +266,14 @@ scene.background = new THREE.Color( 0x808080 )
 // TODO avatar 
 // TODO add text working on Page
 
-
-
-
 // TODO: stop animation when the window is not in focus.
 
 
 /** backlog*/ 
-
 // TODO Create a horizontal scene
 // // todo add GUI
 // todo use gui
 // // TODO test the new resizing concept
-
-
 // // TODO: Add SDKs for Firebase products that you want to use
 
 
@@ -289,6 +283,7 @@ const fbxLoader = new FBXLoader()
 
 const myModelRef = ref( appStorage, 'letter.fbx')
 
+// todo abstract this
 let targetEnverment = () => {
     return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
         :   process.env.NODE_ENV
@@ -297,15 +292,13 @@ let targetEnverment = () => {
 
 
 
-// todo : make conditions for the different envs (dev, prod, emulator)
+// // todo : make conditions for the different envs (dev, prod, emulator)
+// // todo we can change loadModel to be function that takes the url as an argument
+// // TODO remove this finction 
 
 
-// we can change this to be function that takes the url as an argument
-
-
-// TODO remove this finction 
-
-const loadModel = ( url ) => {
+// todo: add the scene as argument to the function loadModel
+const addObjToScene = ( url ) => {
     fbxLoader.load( url, 
         (object) => {
             object.scale.set(.1, .1, .1)
@@ -326,35 +319,90 @@ const myModelsInfoMoch = [
     {name: "HTML"},
 ]
 
-// TODO new data schema collection { name: "contact",  models [ array of modal gonna be used in contact component] } all files gonna be in the same folder 
+const myModelsInfoMoch2 = [
+    {name: "css"},
+    {name: "firebase"},
+]
+
+const myModelsCollectionsmyMoch = [
+    {
+        name:"contants",
+        models: myModelsInfoMoch 
+    },
+    {
+        name:"contants",
+        models: myModelsInfoMoch2
+    },
+]
+
+// TODO new data schema for firestore collection collection { name: "contact",  models [ array of modal gonna be used in contact component] } all files gonna be in the same folder 
  
 
 
 
 
-
-console.log("targetEnverment:", targetEnverment()) 
-
-//loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[0] )
-//loadModel( URLs, storageURL, targetEnverment, myModelsInfoMoch[1] )
 // TODO refactor : abstract the env checking process to a function and move it to a diff drectory (env || config)S
+// todo remove assets dir form git
 
 
 
 
-
-
+// todo abstract this to a function
 if (targetEnverment() === "emulator") {
     connectStorageEmulator( myStorage, "localhost", 9199)
-    getURLAndDownloadModel(myModelRef,loadModel)
+    // todo devide this funciton to two functions
+    getURLAndDownloadModel(myModelRef,addObjToScene)
 }
 
 if (targetEnverment() === "development") {
     const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
-    loadModel( url )   
+    addModelToScene(  await loadModel(url) ,scene )
+    
+    console.log('this is my obj 2 ', await loadModel(url))
 }
+
 
 
 if ( targetEnverment() === "production" ) {
-    getURLAndDownloadModel(myModelRef,loadModel)
+    getURLAndDownloadModel(myModelRef,addObjToScene)
 }
+
+
+// todo: emulator firestore
+// todo: create a fucntion that fetch all the colloections of the models from firestore
+// todo: create a function that takes as argument collection name and returns the array of models names
+// todo: create a function that takes as argument an array of models names and retuens an array of objcts with the mode name and the url of the model in the farebase storage
+// todo: create a function that takes as argument an array of objects and a postion function render all the models in the scene 
+// todo: craete a function that returns a random position
+// todo: ditch the random position and use only three or four models that turns => so create a function that retern positions 
+
+function positions(numberOfmodels){
+
+}
+
+// todo: function to loadobject 
+// todo: function to add object to the scene
+// todo: function for the positon 
+
+
+
+
+// // todo: create a function that takes as argumnet model ref and retuns download url
+
+
+
+
+
+async function myfunction(fetchDownloadURL, myModelRef) {
+    let  url = await fetchDownloadURL(myModelRef)
+    
+    console.log('also this is the same url:', await fetchDownloadURL(myModelRef))
+}
+
+
+
+
+
+
+myfunction(fetchDownloadURL, myModelRef)
+
