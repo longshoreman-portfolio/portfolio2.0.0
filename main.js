@@ -6,6 +6,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
+
+
+
 import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
 
@@ -410,3 +414,30 @@ async function myfunction(fetchDownloadURL, myModelRef) {
 
 myfunction(fetchDownloadURL, myModelRef)
 
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+
+const loader = new FontLoader();
+
+loader.load( './assets/fonts/typeface.json', function ( font ) {
+
+	const geometry = new TextGeometry( 'Hello three.js!', {
+		font: font,
+		size: 80,
+		height: 0,
+		// curveSegments: 12,
+		// bevelEnabled: true,
+		// bevelThickness: 10,
+		// bevelSize: 8,
+		// bevelSegments: 5
+	} )
+
+    const material = new THREE.MeshStandardMaterial({color:0x111111})
+
+    const text = new THREE.Mesh( geometry, material )
+
+
+    text.position.set( 0, 0, 0 )
+    text.rotation.set( 0, 0, 0 )
+    text.scale.set( .05, .05, .05 )
+    scene.add( text )
+})
