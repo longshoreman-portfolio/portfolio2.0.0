@@ -79,6 +79,9 @@ const getURLAndDownloadModel = (myModelRef , loadModel) => {
 //todo make it proprtional to camera distance || position
 
 
+
+
+
 function addModelToScene( object, scene ) {
 
     const width = window.innerWidth
@@ -181,28 +184,12 @@ async function fetchDownloadURL(ref) {
         })
 }
 
-function landingPageRandmoPositions() {
-    return [
-        {x: -1, y: -1, z: -1},
-        {x: 1, y: -1, z: -1},
-        {x: -1, y: 1, z: -1},
-    ]
-}
 
-function randomInRange(start,end){
-    return Math.floor(Math.random() * (end - start + 1) + start);
-}
 
-function objectRandomPositionInLandingPage(randomInRange) { 
-    
 
-    
-    return {
-        x: randomInRange(-10, 10),
-        y: randomInRange(-10, 10),
-        z: randomInRange(-10, 10)
-    }
-}
+
+
+
 
 // todo: find relations between three js scale and window.innerWidth and window.innerHeight
 
