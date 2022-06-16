@@ -27,6 +27,11 @@ import { async } from '@firebase/util'
 /** Debug */
 const gui = new dat.GUI()
 
+const size = 200
+const divisions = 10
+const gridHelper = new THREE.GridHelper( size, divisions )
+
+
 
 /** Canvas */
 const renderer = new THREE.WebGLRenderer({
@@ -128,6 +133,8 @@ scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, poi
 
 
 
+scene.add( gridHelper )
+
 /** Sizes */
 
 //  // TODO: This not a good approach. Try change the camera position instead of the scaling everything.
@@ -176,7 +183,7 @@ window.addEventListener('resize', () =>
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     camera.position.setZ(50)
-
+    camera.position.setY(5)
 
 /** Renderer */
 
