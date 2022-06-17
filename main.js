@@ -6,6 +6,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
+
+
 import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
 
@@ -26,6 +29,11 @@ import { async } from '@firebase/util'
 
 /** Debug */
 const gui = new dat.GUI()
+
+const size = 200
+const divisions = 10
+const gridHelper = new THREE.GridHelper( size, divisions )
+
 
 
 /** Canvas */
@@ -128,6 +136,8 @@ scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, poi
 
 
 
+scene.add( gridHelper )
+
 /** Sizes */
 
 //  // TODO: This not a good approach. Try change the camera position instead of the scaling everything.
@@ -176,7 +186,7 @@ window.addEventListener('resize', () =>
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     camera.position.setZ(50)
-
+    camera.position.setY(5)
 
 /** Renderer */
 
@@ -345,25 +355,27 @@ const myModelsCollectionsmyMoch = [
 // todo remove assets dir form git
 
 
+async () => {
+    // todo abstract this to a function
+    if (targetEnverment() === "emulator") {
+        connectStorageEmulator( myStorage, "localhost", 9199)
+        // todo devide this funciton to two functions
+        getURLAndDownloadModel(myModelRef,addObjToScene)
+    }
+
+    if (targetEnverment() === "development") {
+        const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+        addModelToScene(  await loadModel(url) ,scene )
+    }
 
 
-// todo abstract this to a function
-if (targetEnverment() === "emulator") {
-    connectStorageEmulator( myStorage, "localhost", 9199)
-    // todo devide this funciton to two functions
-    getURLAndDownloadModel(myModelRef,addObjToScene)
+
+    if ( targetEnverment() === "production" ) {
+        getURLAndDownloadModel(myModelRef,addObjToScene)
+    }
 }
 
-if (targetEnverment() === "development") {
-    const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
-    addModelToScene(  await loadModel(url) ,scene )
-}
 
-
-
-if ( targetEnverment() === "production" ) {
-    getURLAndDownloadModel(myModelRef,addObjToScene)
-}
 
 
 // todo: emulator firestore
@@ -403,3 +415,58 @@ async function myfunction(fetchDownloadURL, myModelRef) {
 
 myfunction(fetchDownloadURL, myModelRef)
 
+
+
+
+// instantiate a loader
+const loader = new SVGLoader();
+
+// load a SVG resource
+loader.load(
+	// resource URL
+	'assets/svg/reach-out.svg',
+	// called when the resource is loaded
+	function ( data ) {
+
+		const paths = data.paths;
+		const group = new THREE.Group();
+
+		for ( let i = 0; i < paths.length; i ++ ) {
+
+			const path = paths[ i ];
+
+			const material = new THREE.MeshBasicMaterial( {
+				color: path.color,
+				side: THREE.DoubleSide,
+				depthWrite: false
+			} );
+
+			const shapes = SVGLoader.createShapes( path );
+
+			for ( let j = 0; j < shapes.length; j ++ ) {
+
+				const shape = shapes[ j ];
+				const geometry = new THREE.ShapeGeometry( shape );
+				const mesh = new THREE.Mesh( geometry, material );
+				group.add( mesh );
+
+			}
+
+		}
+
+		scene.add( group );
+
+	},
+	// called when loading is in progresses
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' );
+
+	}
+);
