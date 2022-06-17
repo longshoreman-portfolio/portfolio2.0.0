@@ -6,8 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
-
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 
 import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
@@ -414,30 +413,58 @@ async function myfunction(fetchDownloadURL, myModelRef) {
 
 myfunction(fetchDownloadURL, myModelRef)
 
-import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-
-const loader = new FontLoader();
-
-loader.load( './assets/fonts/typeface.json', function ( font ) {
-
-	const geometry = new TextGeometry( 'Hello three.js!', {
-		font: font,
-		size: 80,
-		height: 0,
-		// curveSegments: 12,
-		// bevelEnabled: true,
-		// bevelThickness: 10,
-		// bevelSize: 8,
-		// bevelSegments: 5
-	} )
-
-    const material = new THREE.MeshStandardMaterial({color:0x111111})
-
-    const text = new THREE.Mesh( geometry, material )
 
 
-    text.position.set( 0, 0, 0 )
-    text.rotation.set( 0, 0, 0 )
-    text.scale.set( .05, .05, .05 )
-    scene.add( text )
-})
+
+// instantiate a loader
+const loader = new SVGLoader();
+
+// load a SVG resource
+loader.load(
+	// resource URL
+	'assets/svg/reach-out.svg',
+	// called when the resource is loaded
+	function ( data ) {
+
+		const paths = data.paths;
+		const group = new THREE.Group();
+
+		for ( let i = 0; i < paths.length; i ++ ) {
+
+			const path = paths[ i ];
+
+			const material = new THREE.MeshBasicMaterial( {
+				color: path.color,
+				side: THREE.DoubleSide,
+				depthWrite: false
+			} );
+
+			const shapes = SVGLoader.createShapes( path );
+
+			for ( let j = 0; j < shapes.length; j ++ ) {
+
+				const shape = shapes[ j ];
+				const geometry = new THREE.ShapeGeometry( shape );
+				const mesh = new THREE.Mesh( geometry, material );
+				group.add( mesh );
+
+			}
+
+		}
+
+		scene.add( group );
+
+	},
+	// called when loading is in progresses
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' );
+
+	}
+);
