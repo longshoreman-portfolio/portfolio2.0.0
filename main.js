@@ -355,25 +355,27 @@ const myModelsCollectionsmyMoch = [
 // todo remove assets dir form git
 
 
+async () => {
+    // todo abstract this to a function
+    if (targetEnverment() === "emulator") {
+        connectStorageEmulator( myStorage, "localhost", 9199)
+        // todo devide this funciton to two functions
+        getURLAndDownloadModel(myModelRef,addObjToScene)
+    }
+
+    if (targetEnverment() === "development") {
+        const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+        addModelToScene(  await loadModel(url) ,scene )
+    }
 
 
-// todo abstract this to a function
-if (targetEnverment() === "emulator") {
-    connectStorageEmulator( myStorage, "localhost", 9199)
-    // todo devide this funciton to two functions
-    getURLAndDownloadModel(myModelRef,addObjToScene)
+
+    if ( targetEnverment() === "production" ) {
+        getURLAndDownloadModel(myModelRef,addObjToScene)
+    }
 }
 
-if (targetEnverment() === "development") {
-    const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
-    addModelToScene(  await loadModel(url) ,scene )
-}
 
-
-
-if ( targetEnverment() === "production" ) {
-    getURLAndDownloadModel(myModelRef,addObjToScene)
-}
 
 
 // todo: emulator firestore
