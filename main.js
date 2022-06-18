@@ -355,6 +355,9 @@ const myModelsCollectionsmyMoch = [
 // todo remove assets dir form git
 
 
+
+
+
 async () => {
     // todo abstract this to a function
     if (targetEnverment() === "emulator") {
@@ -399,74 +402,104 @@ async () => {
 // // todo: create a function that takes as argumnet model ref and retuns download url
 
 
+// async function myfunction(fetchDownloadURL, myModelRef) {
+//     return await fetchDownloadURL(myModelRef)
+// }
 
 
 
-async function myfunction(fetchDownloadURL, myModelRef) {
-    let  url = await fetchDownloadURL(myModelRef)
+
+
+
+//myfunction(fetchDownloadURL, myModelRef)
+
+
+
+//myfunction(fetchDownloadURL, mySVG)
+
+// load a SVG resource
+
+function loadSVG(url) { 
+    const loader = new SVGLoader()
+    console.log('svg loder started') 
+    loader.load(
+        // resource URL
+        url,
+        // called when the resource is loaded
+        ( data ) => {
+            const paths = data.paths
+            const group = new THREE.Group()
+            console.log('data from svg:', paths)
+            for ( let i = 0; i < paths.length; i ++ ) {
+                console.log('iteration over svg paths ',i,' time') 
+                const path = paths[ i ]
     
-    console.log('also this is the same url:', await fetchDownloadURL(myModelRef))
+                const material = new THREE.MeshBasicMaterial( {
+                    color: path.color,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                } );
+    
+                const shapes = SVGLoader.createShapes( path )
+    
+                for ( let j = 0; j < shapes.length; j ++ ) {
+                    console.log('iteration over svg shapes',j,'time') 
+                    const shape = shapes[ j ]
+                    const geometry = new THREE.ShapeGeometry( shape )
+                    const mesh = new THREE.Mesh( geometry, material )
+                    group.add( mesh )
+    
+                }
+    
+            }
+            console.log('group added to scene')
+            scene.add( group )
+    
+        },
+        // called when loading is in progresses
+        ( xhr ) => {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
+    
+        },
+        // called when loading has errors
+        ( error ) => {
+    
+            console.log( 'An error happened' )
+    
+        }
+        
+    )
+    console.log('svg function end')
 }
 
 
 
 
+const mySVGRef = ref( appStorage, 'about-me.svg')
+
+async function func () {
+    // todo abstract this to a function
+    console.log("new")
+    if (targetEnverment() === "emulator") {
+        connectStorageEmulator( appStorage, "localhost", 9199)
+        const SVGURL = await fetchDownloadURL(mySVGRef)
+         loadSVG(SVGURL)
+        
+    }
+
+    if (targetEnverment() === "development") {
+        const SVGURL = storageURL( routes, targetEnverment ) + 'svg/about-me.svg'
+        loadSVG(SVGURL)
+    }
 
 
-myfunction(fetchDownloadURL, myModelRef)
 
+    if ( targetEnverment() === "production" ) {
 
+        const SVGURL = await fetchDownloadURL(mySVGRef)
+        loadSVG(SVGURL)
+    }
+}
 
-
-// instantiate a loader
-const loader = new SVGLoader();
-
-// load a SVG resource
-loader.load(
-	// resource URL
-	'assets/svg/reach-out.svg',
-	// called when the resource is loaded
-	function ( data ) {
-
-		const paths = data.paths;
-		const group = new THREE.Group();
-
-		for ( let i = 0; i < paths.length; i ++ ) {
-
-			const path = paths[ i ];
-
-			const material = new THREE.MeshBasicMaterial( {
-				color: path.color,
-				side: THREE.DoubleSide,
-				depthWrite: false
-			} );
-
-			const shapes = SVGLoader.createShapes( path );
-
-			for ( let j = 0; j < shapes.length; j ++ ) {
-
-				const shape = shapes[ j ];
-				const geometry = new THREE.ShapeGeometry( shape );
-				const mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
-
-			}
-
-		}
-
-		scene.add( group );
-
-	},
-	// called when loading is in progresses
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
-	}
-);
+func ()
