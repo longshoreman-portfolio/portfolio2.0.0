@@ -8,6 +8,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
+import { loadSVG, materilizeSVG } from './helpers/svg-helper.js'
 
 import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
@@ -362,8 +363,12 @@ async () => {
     // todo abstract this to a function
     if (targetEnverment() === "emulator") {
         connectStorageEmulator( myStorage, "localhost", 9199)
+        const modelURL = await fetchDownloadURL(myModelRef)
+        const model = await loadModel(modelURL)
+        addModelToScene(model,scene)
         // todo devide this funciton to two functions
-        getURLAndDownloadModel(myModelRef,addObjToScene)
+        //getURLAndDownloadModel(myModelRef,addObjToScene)
+
     }
 
     if (targetEnverment() === "development") {
@@ -374,7 +379,10 @@ async () => {
 
 
     if ( targetEnverment() === "production" ) {
-        getURLAndDownloadModel(myModelRef,addObjToScene)
+        //getURLAndDownloadModel(myModelRef,addObjToScene)
+        const modelURL = await fetchDownloadURL(myModelRef)
+        const model = await loadModel(modelURL)
+        addModelToScene(model,scene)
     }
 }
 
@@ -419,59 +427,48 @@ async () => {
 
 // load a SVG resource
 
-function loadSVG(url) { 
-    const loader = new SVGLoader()
-    console.log('svg loder started') 
-    loader.load(
-        // resource URL
-        url,
-        // called when the resource is loaded
-        ( data ) => {
-            const paths = data.paths
-            const group = new THREE.Group()
-            console.log('data from svg:', paths)
-            for ( let i = 0; i < paths.length; i ++ ) {
-                console.log('iteration over svg paths ',i,' time') 
-                const path = paths[ i ]
+// function loadSVG(url) { 
+//     const loader = new SVGLoader()
+//     loader.load(
+//         // resource URL
+//         url,
+//         // called when the resource is loaded
+//         ( data ) => {
+//             const paths = data.paths
+//             const group = new THREE.Group()
+//             for ( let i = 0; i < paths.length; i ++ ) {
+//                 const path = paths[ i ]
     
-                const material = new THREE.MeshBasicMaterial( {
-                    color: path.color,
-                    side: THREE.DoubleSide,
-                    depthWrite: false
-                } );
+//                 const material = new THREE.MeshBasicMaterial( {
+//                     color: path.color,
+//                     side: THREE.DoubleSide,
+//                     depthWrite: false
+//                 } );
     
-                const shapes = SVGLoader.createShapes( path )
+//                 const shapes = SVGLoader.createShapes( path )
     
-                for ( let j = 0; j < shapes.length; j ++ ) {
-                    console.log('iteration over svg shapes',j,'time') 
-                    const shape = shapes[ j ]
-                    const geometry = new THREE.ShapeGeometry( shape )
-                    const mesh = new THREE.Mesh( geometry, material )
-                    group.add( mesh )
+//                 for ( let j = 0; j < shapes.length; j ++ ) {
+//                     const shape = shapes[ j ]
+//                     const geometry = new THREE.ShapeGeometry( shape )
+//                     const mesh = new THREE.Mesh( geometry, material )
+//                     group.add( mesh )
     
-                }
+//                 }
     
-            }
-            console.log('group added to scene')
-            scene.add( group )
+//             }
+//             scene.add( group )
     
-        },
-        // called when loading is in progresses
-        ( xhr ) => {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
-    
-        },
-        // called when loading has errors
-        ( error ) => {
-    
-            console.log( 'An error happened' )
-    
-        }
-        
-    )
-    console.log('svg function end')
-}
+//         },
+//         // called when loading is in progresses
+//         ( xhr ) => {
+//             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
+//         },
+//         // called when loading has errors
+//         ( error ) => {
+//             console.log( 'An error happened:',error )
+//         }
+//     )
+// }
 
 
 
@@ -480,17 +477,22 @@ const mySVGRef = ref( appStorage, 'about-me.svg')
 
 async function func () {
     // todo abstract this to a function
-    console.log("new")
     if (targetEnverment() === "emulator") {
         connectStorageEmulator( appStorage, "localhost", 9199)
         const SVGURL = await fetchDownloadURL(mySVGRef)
-         loadSVG(SVGURL)
+        //loadSVG(SVGURL)
         
     }
 
     if (targetEnverment() === "development") {
-        const SVGURL = storageURL( routes, targetEnverment ) + 'svg/about-me.svg'
-        loadSVG(SVGURL)
+        
+        const SVGURL = await storageURL( routes, targetEnverment ) + 'svg/reach-out.svg'
+
+        console.log('svg',await loadSVG(SVGURL))
+        // groupUpSVG(await loadSVG(SVGURL))
+        console.log('group',await materilizeSVG(SVGURL))
+        scene.add( await materilizeSVG(SVGURL) )
+        
     }
 
 
@@ -498,7 +500,7 @@ async function func () {
     if ( targetEnverment() === "production" ) {
 
         const SVGURL = await fetchDownloadURL(mySVGRef)
-        loadSVG(SVGURL)
+        //loadSVG(SVGURL)
     }
 }
 
