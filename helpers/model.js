@@ -81,6 +81,7 @@ const getURLAndDownloadModel = (myModelRef , loadModel) => {
 
 
 
+// todo: to take position and scale as arguments
 
 function addModelToScene( object, scene ) {
 
@@ -98,6 +99,12 @@ function addModelToScene( object, scene ) {
     object.position.set( x , z, 0)
     scene.add(object)
 }
+
+
+function addToScene( object, scene ) {
+    
+}
+
 
 function setScale( object, scale ) {
     return object.scale.set(scale, scale, scale)
@@ -124,7 +131,7 @@ async function loadModel ( url ) {
 }
 
 
-async function fetchDownloadURL(ref) {
+async function fetchDownloadURL (ref) {
     return await getDownloadURL(ref)
         .then((url) => {
             return url
@@ -183,13 +190,6 @@ async function fetchDownloadURL(ref) {
             }
         })
 }
-
-
-
-
-
-
-
 
 // todo: find relations between three js scale and window.innerWidth and window.innerHeight
 
