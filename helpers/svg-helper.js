@@ -19,15 +19,15 @@ async function loadSVG(url) {
             console.log( 'An error happened:',error )
         }
     )
-    console.log('result:', result)
+    console.log('raw svg', result)
     return result
+
 }
 
 
 function materilizeSVG(svg) {
     const group = new THREE.Group()
     const paths = svg.paths
-
     for ( let i = 0; i < paths.length; i ++ ) {
         const path = paths[ i ]
 

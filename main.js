@@ -487,11 +487,13 @@ async function func () {
     if (targetEnverment() === "development") {
         
         const SVGURL = await storageURL( routes, targetEnverment ) + 'svg/reach-out.svg'
-
-        console.log('svg',await loadSVG(SVGURL))
-        // groupUpSVG(await loadSVG(SVGURL))
-        console.log('group',await materilizeSVG(SVGURL))
-        scene.add( await materilizeSVG(SVGURL) )
+       // console.log('group',await materilizeSVG(SVGURL))
+        const rawSVG = await loadSVG(SVGURL)
+        
+       const obj0 =  { paths: [rawSVG.paths[0]], xml:rawSVG.xml }
+       const obj1 =  { paths: [rawSVG.paths[1]], xml:rawSVG.xml }
+       const obj2 =  { paths: [rawSVG.paths[2]], xml:rawSVG.xml }
+       scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
         
     }
 
