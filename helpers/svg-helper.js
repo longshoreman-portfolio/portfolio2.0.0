@@ -49,8 +49,18 @@ function materilizeSVG(svg) {
 
     }
     return group
+} 
+// todo: create a function that takes an object of array and return array of objects 
+function divideObject (obj) {
+    
+    const arr = []
+    for ( let i = 0; i < obj.paths.length; i++ ) {
+        arr[i] = { paths: [obj.paths[i]], xml:obj.xml }
+    } 
+    return arr
 }
 
+// todo: scale down the mid section on of the text : 1- when camera modeved OR 2- when the models moved
 
 
-export { loadSVG, materilizeSVG }
+export { loadSVG, materilizeSVG, divideObject }

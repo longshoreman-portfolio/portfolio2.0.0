@@ -8,7 +8,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
-import { loadSVG, materilizeSVG } from './helpers/svg-helper.js'
+import { loadSVG, materilizeSVG, divideObject } from './helpers/svg-helper.js'
 
 import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
@@ -493,8 +493,8 @@ async function func () {
        const obj0 =  { paths: [rawSVG.paths[0]], xml:rawSVG.xml }
        const obj1 =  { paths: [rawSVG.paths[1]], xml:rawSVG.xml }
        const obj2 =  { paths: [rawSVG.paths[2]], xml:rawSVG.xml }
-       scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
-        
+      // scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
+        scene.add( materilizeSVG( divideObject(rawSVG)[2]  ) )
     }
 
 
