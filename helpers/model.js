@@ -102,7 +102,7 @@ function addModelToScene( object, scene ) {
 
 
 function addToScene( object, scene ) {
-    
+
 }
 
 
@@ -112,6 +112,9 @@ function setScale( object, scale ) {
 
 function setPosition( object, position ) {
     return object.position.set(position.x, position.y, position.z)
+}
+
+function setAngle( object , angle ) {
 }
 
 async function loadModel ( url ) {
@@ -199,4 +202,4 @@ async function fetchDownloadURL (ref) {
 
 
 
-export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene, setScale, setPosition }
+export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene, setScale, setPosition, setAngle }
