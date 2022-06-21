@@ -8,9 +8,9 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
-import { loadSVG, materilizeSVG, divideObject } from './helpers/svg-helper.js'
+import { loadSVG, materilizeSVG, splitObject } from './helpers/svg-helper.js'
 
-import { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
+import { storageURL, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
 
 
 import * as dat from 'dat.gui'
@@ -22,7 +22,6 @@ import { app , appStorage }  from './firebase-config.js'
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
 import { routes } from './router'
-import { async } from '@firebase/util'
 
 
 
@@ -142,16 +141,6 @@ scene.add( gridHelper )
 /** Sizes */
 
 //  // TODO: This not a good approach. Try change the camera position instead of the scaling everything.
-/** Legacy code */
-/** 
-window.addEventListener( 'resize', onWindowResize, false );
-function onWindowResize(){
-   window.location.reload()
-   window.innerWidth <= 1500 ? scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25) : null
-}
-scene.scale.set(window.innerWidth*0.0005 +0.25 , window.innerWidth*0.0005 +0.25, window.innerWidth*0.0005 +0.25)
-*/
-
 
 
     //Update sizes
@@ -261,12 +250,6 @@ controls.enableZoom = false;
     }
     animateLoop()
 
-
-
-
-
-    
-
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
 scene.background = new THREE.Color( 0x808080 )
@@ -367,7 +350,6 @@ async () => {
         const model = await loadModel(modelURL)
         addModelToScene(model,scene)
         // todo devide this funciton to two functions
-        //getURLAndDownloadModel(myModelRef,addObjToScene)
 
     }
 
@@ -379,7 +361,6 @@ async () => {
 
 
     if ( targetEnverment() === "production" ) {
-        //getURLAndDownloadModel(myModelRef,addObjToScene)
         const modelURL = await fetchDownloadURL(myModelRef)
         const model = await loadModel(modelURL)
         addModelToScene(model,scene)
@@ -410,66 +391,6 @@ async () => {
 // // todo: create a function that takes as argumnet model ref and retuns download url
 
 
-// async function myfunction(fetchDownloadURL, myModelRef) {
-//     return await fetchDownloadURL(myModelRef)
-// }
-
-
-
-
-
-
-//myfunction(fetchDownloadURL, myModelRef)
-
-
-
-//myfunction(fetchDownloadURL, mySVG)
-
-// load a SVG resource
-
-// function loadSVG(url) { 
-//     const loader = new SVGLoader()
-//     loader.load(
-//         // resource URL
-//         url,
-//         // called when the resource is loaded
-//         ( data ) => {
-//             const paths = data.paths
-//             const group = new THREE.Group()
-//             for ( let i = 0; i < paths.length; i ++ ) {
-//                 const path = paths[ i ]
-    
-//                 const material = new THREE.MeshBasicMaterial( {
-//                     color: path.color,
-//                     side: THREE.DoubleSide,
-//                     depthWrite: false
-//                 } );
-    
-//                 const shapes = SVGLoader.createShapes( path )
-    
-//                 for ( let j = 0; j < shapes.length; j ++ ) {
-//                     const shape = shapes[ j ]
-//                     const geometry = new THREE.ShapeGeometry( shape )
-//                     const mesh = new THREE.Mesh( geometry, material )
-//                     group.add( mesh )
-    
-//                 }
-    
-//             }
-//             scene.add( group )
-    
-//         },
-//         // called when loading is in progresses
-//         ( xhr ) => {
-//             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
-//         },
-//         // called when loading has errors
-//         ( error ) => {
-//             console.log( 'An error happened:',error )
-//         }
-//     )
-// }
-
 
 
 
@@ -490,11 +411,8 @@ async function func () {
        // console.log('group',await materilizeSVG(SVGURL))
         const rawSVG = await loadSVG(SVGURL)
         
-       const obj0 =  { paths: [rawSVG.paths[0]], xml:rawSVG.xml }
-       const obj1 =  { paths: [rawSVG.paths[1]], xml:rawSVG.xml }
-       const obj2 =  { paths: [rawSVG.paths[2]], xml:rawSVG.xml }
       // scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
-        scene.add( materilizeSVG( divideObject(rawSVG)[2]  ) )
+        scene.add( materilizeSVG( splitObject(rawSVG)[2]  ) )
     }
 
 
