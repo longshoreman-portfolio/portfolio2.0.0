@@ -4,24 +4,19 @@ import * as THREE from 'three'
 async function loadSVG(url) { 
     const loader = new SVGLoader()
     const result = await loader.loadAsync(
-        // resource URL
         url,
-        // called when the resource is loaded
         ( data ) => {
             return data
         },
-        // called when loading is in progresses
         ( xhr ) => {
             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
         },
-        // called when loading has errors
         ( error ) => {
-            console.log( 'An error happened:',error )
+            console.log( 'An error happened:', error )
         }
     )
     console.log('raw svg', result)
     return result
-
 }
 
 
@@ -50,9 +45,8 @@ function materilizeSVG(svg) {
     }
     return group
 } 
-// todo: create a function that takes an object of array and return array of objects 
-function divideObject (obj) {
-    
+// // todo: create a function that takes an object of array and return array of objects 
+function splitObject (obj) { 
     const arr = []
     for ( let i = 0; i < obj.paths.length; i++ ) {
         arr[i] = { paths: [obj.paths[i]], xml:obj.xml }
@@ -63,4 +57,4 @@ function divideObject (obj) {
 // todo: scale down the mid section on of the text : 1- when camera modeved OR 2- when the models moved
 
 
-export { loadSVG, materilizeSVG, divideObject }
+export { loadSVG, materilizeSVG, splitObject }
