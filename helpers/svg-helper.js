@@ -15,7 +15,6 @@ async function loadSVG(url) {
             console.log( 'An error happened:', error )
         }
     )
-    console.log('raw svg', result)
     return result
 }
 
