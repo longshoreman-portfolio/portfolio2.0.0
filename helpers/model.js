@@ -132,4 +132,4 @@ async function fetchDownloadURL (ref) {
 
 
 
-export { storageURL, getURLAndDownloadModel, fetchDownloadURL, loadModel, addModelToScene, setScale, setPosition, setAngle, addToScene }
+export { storageURL, fetchDownloadURL, loadModel, addModelToScene, addToScene }

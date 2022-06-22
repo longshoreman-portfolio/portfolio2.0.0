@@ -39,6 +39,7 @@ const gridHelper = new THREE.GridHelper( size, divisions )
 /** Canvas */
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
+    antialias: true
 })
 
 /** Scene */
