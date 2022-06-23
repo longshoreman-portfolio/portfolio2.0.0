@@ -1,4 +1,4 @@
-export default async function loadAsset(url, loader) { 
+export default async function loadAsset(url, loader  /* can be svg loader of fbx loader */) { 
     const result = await loader.loadAsync(
         url,
         ( data ) => {

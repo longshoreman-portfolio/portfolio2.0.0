@@ -413,7 +413,7 @@ async function func () {
         const rawSVG = await loadSVG(SVGURL)
         
       // scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
-        scene.add( materilizeSVG( splitObject(rawSVG)[2]  ) )
+        scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
     }
 
 
