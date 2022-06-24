@@ -319,6 +319,14 @@ const myModelsInfoMoch2 = [
     {name: "firebase"},
 ]
 
+const mySVGsMoch = [ 
+    {name: "svg/reach-out.svg"},
+    {name: "svg/my-story.svg"},
+    {name: "svg/my-work.svg"},
+    {name: "svg/by-me-a-coffee.svg"},
+
+]
+
 const myModelsCollectionsmyMoch = [
     {
         name:"contants",
@@ -407,13 +415,13 @@ async function func () {
     }
 
     if (targetEnverment() === "development") {
-        
-        const SVGURL = await storageURL( routes, targetEnverment ) + 'svg/reach-out.svg'
-       // console.log('group',await materilizeSVG(SVGURL))
-        const rawSVG = await loadSVG(SVGURL)
-        
-      // scene.add(  materilizeSVG( obj0 ), materilizeSVG( obj1 ), materilizeSVG( obj2 ) )
-        scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
+
+        // todo: make a function
+        mySVGsMoch.forEach(async element => {
+            const SVGURL = await storageURL( routes, targetEnverment ) + element.name
+            const rawSVG = await loadSVG(SVGURL)
+            scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
+        })
     }
 
 
