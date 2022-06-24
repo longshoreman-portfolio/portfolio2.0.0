@@ -22,6 +22,7 @@ import { app , appStorage }  from './firebase-config.js'
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
 import { routes } from './router'
+import { async } from '@firebase/util'
 
 
 
@@ -416,11 +417,20 @@ async function func () {
 
     if (targetEnverment() === "development") {
 
-        // todo: make a function
+        // todo: to abstract
+        // todo: create a new array with objects and the name
+
+        const myTitels = mySVGsMoch.map(async element => {
+            const SVGURL = await storageURL( routes, targetEnverment ) + element.name
+            const rawSVG = await loadSVG(SVGURL)
+            return {name: element.name, svg: [splitObject(rawSVG)[0],splitObject(rawSVG)[1],splitObject(rawSVG)[2] ]}
+        })
+        scene.add(( myTitels[0]).svg[0])
+
         mySVGsMoch.forEach(async element => {
             const SVGURL = await storageURL( routes, targetEnverment ) + element.name
             const rawSVG = await loadSVG(SVGURL)
-            scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
+            //scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
         })
     }
 
