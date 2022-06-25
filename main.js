@@ -29,7 +29,7 @@ import { async } from '@firebase/util'
 /** texture loader  */
 
 /** Debug */
-const gui = new dat.GUI()
+
 
 const size = 200
 const divisions = 10
@@ -174,19 +174,32 @@ window.addEventListener('resize', () =>
 /** Camera */
     //Base camera
     //Controls
-    const camera = new THREE.OrthographicCamera( window.innerWidth / - 20, window.innerWidth / 20, window.innerHeight / 20, window.innerHeight / - 20, 1, 1000 )
+    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     camera.position.setZ(50)
-    camera.position.setY(5)
-
+    camera.position.setY(15)
+    camera.position.setX(0)
 /** Renderer */
 
+var params = {
+    x: 0
+}
+
+var gui = new dat.GUI();
+
+gui.add(params, 'x', -150,150).step(1).onChange(function(value){
+        changeCameraX(value);
+});
+function changeCameraX(value){
+    camera.position.x = value;
+}
+camera.lookAt(new THREE.Vector3(0,0,0));
 
 /** Interaction with shapes */ 
 // TODO: to be replaced by the raycaster
-const controls = new OrbitControls(camera, renderer.domElement)
-controls.enableZoom = false;
+// const controls = new OrbitControls(camera, renderer.domElement)
+// controls.enableZoom = false;
 
 /** Animate */
     //Update objects
@@ -242,11 +255,6 @@ controls.enableZoom = false;
         shpereGrowing ? sphere.scale.z += 0.001 : sphere.scale.z -= 0.001
         sphere.scale.x >= 1.4 ? shpereGrowing = false : null
         sphere.scale.x <= 0.6 ? shpereGrowing = true : null
-    
-        // scene.rotation.y += 0.003
-        // scene.rotation.x += 0.003
-        
-        controls.update()
     
         renderer.render(scene, camera)
     }
