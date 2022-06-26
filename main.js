@@ -177,7 +177,7 @@ window.addEventListener('resize', () =>
     const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
-    camera.position.setZ(50)
+    camera.position.setZ(100)
     camera.position.setY(15)
     camera.position.setX(0)
 /** Renderer */
@@ -188,7 +188,7 @@ var params = {
 
 var gui = new dat.GUI();
 
-gui.add(params, 'x', -150,150).step(1).onChange(function(value){
+gui.add(params, 'x', -500,500).step(1).onChange(function(value){
         changeCameraX(value);
 });
 function changeCameraX(value){
@@ -329,10 +329,22 @@ const myModelsInfoMoch2 = [
 ]
 
 const mySVGsMoch = [ 
-    {name: "svg/reach-out.svg"},
-    {name: "svg/my-story.svg"},
-    {name: "svg/my-work.svg"},
-    {name: "svg/by-me-a-coffee.svg"},
+    {
+        name: "reach-out",
+        link: "svg/reach-out.svg"
+    },
+    {
+        name: "my-story",
+        link: "svg/my-story.svg"
+    },
+    {
+        name: "my-work",
+        link: "svg/my-work.svg"
+    },
+    {
+        name: "buy-me-a-coffee",
+        link: "svg/buy-me-a-coffee.svg"
+    },
 
 ]
 
@@ -428,18 +440,51 @@ async function func () {
         // todo: to abstract
         // todo: create a new array with objects and the name
 
-        const myTitels = mySVGsMoch.map(async element => {
-            const SVGURL = await storageURL( routes, targetEnverment ) + element.name
-            const rawSVG = await loadSVG(SVGURL)
-            return {name: element.name, svg: [splitObject(rawSVG)[0],splitObject(rawSVG)[1],splitObject(rawSVG)[2] ]}
-        })
-        scene.add(( myTitels[0]).svg[0])
+        const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
+            const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+            console.log('SVGURL:', SVGURL)
 
-        mySVGsMoch.forEach(async element => {
-            const SVGURL = await storageURL( routes, targetEnverment ) + element.name
             const rawSVG = await loadSVG(SVGURL)
-            //scene.add( materilizeSVG( splitObject(rawSVG)[2]  ),materilizeSVG( splitObject(rawSVG)[0] ), materilizeSVG( splitObject(rawSVG)[1]  ) )
-        })
+            console.log('rawSVG:', rawSVG)
+
+            const devidedSVG = splitObject(rawSVG)
+            console.log('devidedSVG:', devidedSVG)
+
+            //scene.add( materilizeSVG(devidedSVG[0]))
+            return {
+                name: element.name, 
+                svg: [
+                    devidedSVG[0],
+                    devidedSVG[1],
+                    devidedSVG[2]
+                ], 
+                materilizedSVG: [
+                    materilizeSVG(devidedSVG[0]),
+                    materilizeSVG(devidedSVG[1]),
+                    materilizeSVG(devidedSVG[2])
+                ]
+            }
+        }))
+
+
+
+
+        //await scene.add(( myTitelsSVGs[0].materilizedSVG[0]))
+        for(let i = 0; i < myTitelsSVGs.length; i++) {
+            myTitelsSVGs[i].materilizedSVG.forEach( svg => {
+                svg.position.setX(i*100 -200)
+                scene.add(svg)
+            })
+
+        }
+
+
+        // myTitelsSVGs.forEach(async element => {
+        //     element.materilizedSVG.forEach( svg => {
+        //         svg.position.setX(-10)
+        //         scene.add(svg)
+        //     })
+        // })
     }
 
 

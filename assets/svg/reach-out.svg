@@ -3,8 +3,8 @@
 
 <svg
    width="50.30442mm"
-   height="7.7049589mm"
-   viewBox="0 0 50.304419 7.7049591"
+   height="9.7978582mm"
+   viewBox="0 0 50.304419 9.7978585"
    version="1.1"
    id="svg5"
    inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="4"
-     inkscape:cx="96.000001"
-     inkscape:cy="25.125"
+     inkscape:cx="65.75"
+     inkscape:cy="43.125"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
@@ -42,8 +42,8 @@
        opacity="0.1254902"
        empcolor="#292930"
        empopacity="0.25098039"
-       originx="14.787727"
-       originy="-27.122941" />
+       originx="14.787726"
+       originy="-25.030042" />
   </sodipodi:namedview>
   <defs
      id="defs2" />
@@ -51,7 +51,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(14.787727,-27.122941)">
+     transform="translate(14.787727,-25.030042)">
     <path
        id="rect1514-6"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.70566;stroke-linecap:round;stroke-linejoin:round"
