@@ -38,9 +38,7 @@ function materilizeSVG(svg) {
             const geometry = new THREE.ShapeGeometry( shape )
             const mesh = new THREE.Mesh( geometry, material )
             group.add( mesh )
-
         }
-
     }
     return group
 } 

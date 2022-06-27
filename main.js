@@ -448,13 +448,13 @@ async function func () {
 
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
-            console.log('SVGURL:', SVGURL)
+            //console.log('SVGURL:', SVGURL)
 
             const rawSVG = await loadSVG(SVGURL)
-            console.log('rawSVG:', rawSVG)
+            //console.log('rawSVG:', rawSVG)
 
             const devidedSVG = splitObject(rawSVG)
-            console.log('devidedSVG:', devidedSVG)
+            // console.log('devidedSVG:', devidedSVG)
 
             //scene.add( materilizeSVG(devidedSVG[0]))
             return {
@@ -481,23 +481,30 @@ async function func () {
             {n: value}
         }
 
+        for(let i = 0; i < myTitelsSVGs.length; i++) {
+            for ( let j = 0; j < 3; j++ ) {
+                myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100 -200)
+                j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
+                scene.add(myTitelsSVGs[i].materilizedSVG[j])
+            }
+        }
+
+        var box = new THREE.Box3().setFromObject( myTitelsSVGs[2].materilizedSVG[1] )
+        myTitelsSVGs[2].materilizedSVG[1].translateX(box.min.x/proprtion.n - box.min.x) // how much to translate midel section 
+        myTitelsSVGs[2].materilizedSVG[2].translateX(-(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n)   // how much  to translate the last part 
+    
 
         gui.add(proprtion,'n', 0.05,0.95).step(.05).onChange((value) => {
             changeProprtion(value)
-
             for(let i = 0; i < myTitelsSVGs.length; i++) {
                 for ( let j = 0; j < 3; j++ ) {
                     myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100 -200)
                     j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
-
-                    scene.add(myTitelsSVGs[i].materilizedSVG[j])
                 }
             }
 
-            
             //console.log( myTitelsSVGs[2].materilizedSVG[0].position.distanceTo(myTitelsSVGs[2].materilizedSVG[1].position))
             var box = new THREE.Box3().setFromObject( myTitelsSVGs[2].materilizedSVG[1] )
-            var xWidth = box.max.x - box.min.x
             myTitelsSVGs[2].materilizedSVG[1].translateX(box.min.x/proprtion.n - box.min.x) // how much to translate midel section 
             myTitelsSVGs[2].materilizedSVG[2].translateX(-(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n)   // how much  to translate the last part 
         
