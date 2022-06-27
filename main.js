@@ -15,6 +15,8 @@ import { storageURL, fetchDownloadURL, loadModel, addModelToScene } from './help
 
 import * as dat from 'dat.gui'
 
+
+
 import {  ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
 
 import { app , appStorage }  from './firebase-config.js'
@@ -188,13 +190,17 @@ var params = {
 
 var gui = new dat.GUI();
 
-gui.add(params, 'x', -500,500).step(1).onChange(function(value){
+gui.add(params, 'x', -150,150).step(1).onChange(function(value){
         changeCameraX(value);
-});
+}) 
+
 function changeCameraX(value){
-    camera.position.x = value;
+    camera.position.x = value
 }
-camera.lookAt(new THREE.Vector3(0,0,0));
+
+
+
+camera.lookAt(new THREE.Vector3(0,0,0))
 
 /** Interaction with shapes */ 
 // TODO: to be replaced by the raycaster
@@ -330,16 +336,16 @@ const myModelsInfoMoch2 = [
 
 const mySVGsMoch = [ 
     {
-        name: "reach-out",
-        link: "svg/reach-out.svg"
-    },
-    {
         name: "my-story",
         link: "svg/my-story.svg"
     },
     {
         name: "my-work",
         link: "svg/my-work.svg"
+    },
+    {
+        name: "reach-out",
+        link: "svg/reach-out.svg"
     },
     {
         name: "buy-me-a-coffee",
@@ -468,26 +474,38 @@ async function func () {
 
 
 
+        var proprtion = {n: .5}
 
-        //await scene.add(( myTitelsSVGs[0].materilizedSVG[0]))
-        for(let i = 0; i < myTitelsSVGs.length; i++) {
-            myTitelsSVGs[i].materilizedSVG.forEach( svg => {
-                svg.position.setX(i*100 -200)
-                scene.add(svg)
-            })
 
+        const changeProprtion = (value) => {
+            {n: value}
         }
 
 
-        // myTitelsSVGs.forEach(async element => {
-        //     element.materilizedSVG.forEach( svg => {
-        //         svg.position.setX(-10)
-        //         scene.add(svg)
-        //     })
-        // })
+        gui.add(proprtion,'n', 0.05,0.95).step(.05).onChange((value) => {
+            changeProprtion(value)
+
+            for(let i = 0; i < myTitelsSVGs.length; i++) {
+                for ( let j = 0; j < 3; j++ ) {
+                    myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100 -200)
+                    j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
+
+                    scene.add(myTitelsSVGs[i].materilizedSVG[j])
+                }
+            }
+
+            
+            //console.log( myTitelsSVGs[2].materilizedSVG[0].position.distanceTo(myTitelsSVGs[2].materilizedSVG[1].position))
+            var box = new THREE.Box3().setFromObject( myTitelsSVGs[2].materilizedSVG[1] )
+            var xWidth = box.max.x - box.min.x
+            myTitelsSVGs[2].materilizedSVG[1].translateX(box.min.x/proprtion.n - box.min.x) // how much to translate midel section 
+            myTitelsSVGs[2].materilizedSVG[2].translateX(-(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n)   // how much  to translate the last part 
+        
+        
+        }) 
     }
 
-
+ 
 
     if ( targetEnverment() === "production" ) {
 
