@@ -190,7 +190,7 @@ var params = {
 
 var gui = new dat.GUI();
 
-gui.add(params, 'x', -150,150).step(1).onChange(function(value){
+gui.add(params, 'x', -50,400).step(1).onChange(function(value){
         changeCameraX(value);
 }) 
 
@@ -263,6 +263,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         sphere.scale.x <= 0.6 ? shpereGrowing = true : null
     
         renderer.render(scene, camera)
+        camera.position.lerp(new THREE.Vector3(120,15,100),.05)
     }
     animateLoop()
 
@@ -473,9 +474,9 @@ async function func () {
         }))
 
 
-
-        var proprtion = {n: .5}
-
+        /** init */
+        var proprtion = {n: 1}
+        var arr = myTitelsSVGs[0]
 
         const changeProprtion = (value) => {
             {n: value}
@@ -483,18 +484,64 @@ async function func () {
 
         for(let i = 0; i < myTitelsSVGs.length; i++) {
             for ( let j = 0; j < 3; j++ ) {
-                myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100 -200)
+                myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100)
                 j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
                 scene.add(myTitelsSVGs[i].materilizedSVG[j])
             }
         }
 
-        var box = new THREE.Box3().setFromObject( myTitelsSVGs[2].materilizedSVG[1] )
-        myTitelsSVGs[2].materilizedSVG[1].translateX(box.min.x/proprtion.n - box.min.x) // how much to translate midel section 
-        myTitelsSVGs[2].materilizedSVG[2].translateX(-(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n)   // how much  to translate the last part 
-    
+       
+        var box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
+        var box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+        arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
+        arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
 
-        gui.add(proprtion,'n', 0.05,0.95).step(.05).onChange((value) => {
+
+         //center camera on the model
+        var box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+        var box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+        camera.position.setX(  (box2.max.x+box1.min.x)/2)
+        console.log('w',(box2.max.x+box1.min.x)/2)
+
+        // camera snap position 
+        const cameraSnapPosition = myTitelsSVGs.map(
+            (element) => {  
+                var box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
+                var box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
+                return  (box2.max.x+box1.min.x)/2
+            }
+        )
+
+        //camera.position.lerp(new THREE.Vector3(cameraSnapPosition[1],15,100),.05)
+        
+        console.log( cameraSnapPosition[1]- cameraSnapPosition[0] )
+
+        console.log('cameraSnapPosition:', cameraSnapPosition)
+
+        // change the camera position on wheel movment 
+        // window.addEventListener('wheel', onMouseWheel)
+        // let Y = 0
+        // let position = 0
+
+        // function onMouseWheel (event) {
+        //     console.log(event.deltaY) 
+        //     (event.deltaY > 0) ? position = position + 1 : position = position - 1
+        // }
+
+
+
+        const scaleMidleSection = ( SVGTitle , n ) => {
+            var box = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+            var box3 = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
+            SVGTitle.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/n - box.min.x+box3.min.x) // how much to translate midel section 
+            SVGTitle.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-n)/n )   // how much  to translate the last part     
+        }
+
+
+
+        /** when change */
+
+        gui.add(proprtion,'n', 0.05,1).step(.05).onChange((value) => {
             changeProprtion(value)
             for(let i = 0; i < myTitelsSVGs.length; i++) {
                 for ( let j = 0; j < 3; j++ ) {
@@ -502,14 +549,13 @@ async function func () {
                     j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
                 }
             }
-
-            //console.log( myTitelsSVGs[2].materilizedSVG[0].position.distanceTo(myTitelsSVGs[2].materilizedSVG[1].position))
-            var box = new THREE.Box3().setFromObject( myTitelsSVGs[2].materilizedSVG[1] )
-            myTitelsSVGs[2].materilizedSVG[1].translateX(box.min.x/proprtion.n - box.min.x) // how much to translate midel section 
-            myTitelsSVGs[2].materilizedSVG[2].translateX(-(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n)   // how much  to translate the last part 
-        
+            myTitelsSVGs.forEach(element => {
+                scaleMidleSection(element, proprtion.n )
+            })
         
         }) 
+
+
     }
 
  
@@ -522,3 +568,18 @@ async function func () {
 }
 
 func ()
+
+
+
+// todo: refacto 
+// todo: find the  best distence between the titels 
+// todo: chnage camera position for each screen size
+
+// todo: create funciton to change camera position : 1. by time 2. by nav bar link
+
+// ! important  create three js carousel function that takes svgs and elements and add to the scene carousel  
+// * spec: 
+
+// * doc 
+// ? whaat 
+// normal 
