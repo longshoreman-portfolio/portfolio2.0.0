@@ -27,16 +27,51 @@ import { routes } from './router'
 import { async } from '@firebase/util'
 
 
+/** global */
+
+var global = {
+    camera: {position: new THREE().Vector3(0,0,0)},
+    titles: [],
+    cameraSnapPosition: [],
+    titlesSVGs: [],
+    
+}
+
+changeCameraSnapPosition = ( arr ) => {
+    global.cameraSnapPosition = [...arr]
+}
+
+getRawTitels = async ( SVGsList, url ) => {
+    
+    return 
+}
+
+
+
+
+ 
+
 
 /** texture loader  */
 
 /** Debug */
-
-
 const size = 200
 const divisions = 10
 const gridHelper = new THREE.GridHelper( size, divisions )
 
+
+
+var cameraSnapPosition = []
+var titles = []
+console.log( titles )
+
+
+const lerpScaleMidleSection = ( SVGTitle , lerp ) => {
+    var box = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    var box3 = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
+    SVGTitle.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/lerp - box.min.x+box3.min.x) // how much to translate midel section 
+    SVGTitle.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-lerp)/lerp )   // how much  to translate the last part     
+}
 
 
 /** Canvas */
@@ -184,6 +219,10 @@ window.addEventListener('resize', () =>
     camera.position.setX(0)
 /** Renderer */
 
+
+
+
+
 var params = {
     x: 0
 }
@@ -220,6 +259,8 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     var cubeDiractionY = false
 
     var shpereGrowing = true
+    var i = 0
+    var j = 0
 
     function animateLoop() {
 
@@ -263,10 +304,52 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         sphere.scale.x <= 0.6 ? shpereGrowing = true : null
     
         renderer.render(scene, camera)
-        camera.position.lerp(new THREE.Vector3(120,15,100),.05)
+        i += 1
+        console.log(j)
+        i === 400   ?   i=0 :   null
+        i === 0     ?   j++ :   null
+        //j === 4     ?   camera.position.setX( -100 ) : null
+        j === 4     ?   j=0 :   null
+
+
+
+        camera.position.lerp(new THREE.Vector3(cameraSnapPosition[j],15,100),.05)
+
+        
+
+
+        // todo make illusion of infinty loop (how to do it when the new obj can be seen whit odl one)
+        // * idea what if i teleport the first object to after the last one and then teleport it back with the camera to the beginning
+        // * when we are at j 3 we teleport the obj0 to postion 4 
+        // * when we are at j 4 we teleport the obj0  and the camera to postion 0 
+
+        
+        
+        // lerpScaleMidleSection(titles[j],(i+1)/400)
+
+        // todo call the midel scale down  function 
+        // todo change color
+        // todo add movement  to models around the title 
+        // todo 
+
+
+
+
+
+
+
+
+
+
     }
     animateLoop()
 
+
+    const myTimeout = setTimeout(()=>{}, 5000)
+
+function myStopFunction() {
+  clearTimeout(myTimeout)
+}
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
 scene.background = new THREE.Color( 0x808080 )
@@ -329,12 +412,6 @@ const myModelsInfoMoch = [
     {name: "letter"},
     {name: "HTML"},
 ]
-
-const myModelsInfoMoch2 = [
-    {name: "css"},
-    {name: "firebase"},
-]
-
 const mySVGsMoch = [ 
     {
         name: "my-story",
@@ -355,16 +432,7 @@ const mySVGsMoch = [
 
 ]
 
-const myModelsCollectionsmyMoch = [
-    {
-        name:"contants",
-        models: myModelsInfoMoch 
-    },
-    {
-        name:"contants",
-        models: myModelsInfoMoch2
-    },
-]
+
 
 // TODO new data schema for firestore collection collection { name: "contact",  models [ array of modal gonna be used in contact component] } all files gonna be in the same folder 
  
@@ -433,6 +501,8 @@ async () => {
 
 const mySVGRef = ref( appStorage, 'about-me.svg')
 
+
+
 async function func () {
     // todo abstract this to a function
     if (targetEnverment() === "emulator") {
@@ -448,6 +518,7 @@ async function func () {
         // todo: create a new array with objects and the name
 
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
+           
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
             //console.log('SVGURL:', SVGURL)
 
@@ -477,7 +548,7 @@ async function func () {
         /** init */
         var proprtion = {n: 1}
         var arr = myTitelsSVGs[0]
-
+        titles = [...myTitelsSVGs]
         const changeProprtion = (value) => {
             {n: value}
         }
@@ -504,7 +575,8 @@ async function func () {
         console.log('w',(box2.max.x+box1.min.x)/2)
 
         // camera snap position 
-        const cameraSnapPosition = myTitelsSVGs.map(
+
+        cameraSnapPosition = myTitelsSVGs.map(
             (element) => {  
                 var box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
                 var box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
@@ -571,15 +643,31 @@ func ()
 
 
 
-// todo: refacto 
+// ! todo: refacto 
+// * global stuff : try redux approach the store
+// * camera position 
+// * title objects 
+// *  
+
 // todo: find the  best distence between the titels 
 // todo: chnage camera position for each screen size
 
 // todo: create funciton to change camera position : 1. by time 2. by nav bar link
 
+// ! solve  impure functions isues 
+
 // ! important  create three js carousel function that takes svgs and elements and add to the scene carousel  
 // * spec: 
+
+
 
 // * doc 
 // ? whaat 
 // normal 
+
+
+
+
+
+
+
