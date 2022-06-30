@@ -30,22 +30,56 @@ import { async } from '@firebase/util'
 /** global */
 
 var global = {
-    camera: {position: new THREE().Vector3(0,0,0)},
+    camera: {position: new THREE.Vector3(0,15,100)},
     titles: [],
     cameraSnapPosition: [],
     titlesSVGs: [],
     
 }
 
-changeCameraSnapPosition = ( arr ) => {
+const changeCameraSnapPosition = ( arr ) => {
     global.cameraSnapPosition = [...arr]
 }
 
-getRawTitels = async ( SVGsList, url ) => {
-    
-    return 
+// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
+const titelsURLs = async (arr) => {
+    return await Promise.all(arr.map(async element => {
+        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
+        return { name: element.name, svgLink: SVGURL }
+    }))
 }
 
+
+// * arr is arr of urls  and names
+const getRawTitels = async ( arr ) => {
+    return await Promise.all(arr.map(element => {
+        const rawSVG = 'await loadSVG(element.oneSVGURL)'
+        return { name: element.name, rawSVG: rawSVG }
+    }))   
+}
+
+// * arra is array of raw svg from firebase storage and  names
+const devidedTitltes = async (arr) => {
+    return arr.map(element => {
+        const devidedSVG = splitObject(rawSVG)
+        return { name: element.name, devidedSVG: devidedSVG }
+    })
+}
+
+// * arra is array of devided svg from firebase storage and  names
+const materilizedtitles = async (arr) => {
+    return await Promise.all(arr.map(async element => {
+        return {
+            name: element.name, 
+            svg: [ ...element.devidedSVG ], 
+            materilizedSVG: [
+                materilizeSVG(element.devidedSVG[0]),
+                materilizeSVG(element.devidedSVG[1]),
+                materilizeSVG(element.devidedSVG[2])
+            ]
+        }
+    }))
+}
 
 
 
@@ -531,11 +565,7 @@ async function func () {
             //scene.add( materilizeSVG(devidedSVG[0]))
             return {
                 name: element.name, 
-                svg: [
-                    devidedSVG[0],
-                    devidedSVG[1],
-                    devidedSVG[2]
-                ], 
+                svg: [ ...devidedSVG ], 
                 materilizedSVG: [
                     materilizeSVG(devidedSVG[0]),
                     materilizeSVG(devidedSVG[1]),
