@@ -664,7 +664,8 @@ const titelsURLs = async (arr) => {
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
     return await Promise.all(arr.map(element => {
-        const rawSVG = loadSVG(storageURL( routes, targetEnverment ) + element.svgLink)
+        const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+        const rawSVG = loadSVG(SVGURL)
 
         return { name: element.name, rawSVG: rawSVG }
     }))   
