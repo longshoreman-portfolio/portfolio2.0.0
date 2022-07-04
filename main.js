@@ -32,54 +32,13 @@ import { async } from '@firebase/util'
 var global = {
     camera: {position: new THREE.Vector3(0,15,100)},
     titles: [],
-    cameraSnapPosition: [],
-    titlesSVGs: [],
-    
+    cameraSnapPosition: [] 
 }
 
 const changeCameraSnapPosition = ( arr ) => {
     global.cameraSnapPosition = [...arr]
 }
 
-// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
-const titelsURLs = async (arr) => {
-    return await Promise.all(arr.map(async element => {
-        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
-        return { name: element.name, svgLink: SVGURL }
-    }))
-}
-
-
-// * arr is arr of urls  and names
-const getRawTitels = async ( arr ) => {
-    return await Promise.all(arr.map(element => {
-        const rawSVG = 'await loadSVG(element.oneSVGURL)'
-        return { name: element.name, rawSVG: rawSVG }
-    }))   
-}
-
-// * arra is array of raw svg from firebase storage and  names
-const devidedTitltes = async (arr) => {
-    return arr.map(element => {
-        const devidedSVG = splitObject(rawSVG)
-        return { name: element.name, devidedSVG: devidedSVG }
-    })
-}
-
-// * arra is array of devided svg from firebase storage and  names
-const materilizedtitles = async (arr) => {
-    return await Promise.all(arr.map(async element => {
-        return {
-            name: element.name, 
-            svg: [ ...element.devidedSVG ], 
-            materilizedSVG: [
-                materilizeSVG(element.devidedSVG[0]),
-                materilizeSVG(element.devidedSVG[1]),
-                materilizeSVG(element.devidedSVG[2])
-            ]
-        }
-    }))
-}
 
 
 
@@ -339,7 +298,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     
         renderer.render(scene, camera)
         i += 1
-        console.log(j)
+        //console.log(j)
         i === 400   ?   i=0 :   null
         i === 0     ?   j++ :   null
         //j === 4     ?   camera.position.setX( -100 ) : null
@@ -378,12 +337,6 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     }
     animateLoop()
 
-
-    const myTimeout = setTimeout(()=>{}, 5000)
-
-function myStopFunction() {
-  clearTimeout(myTimeout)
-}
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
 scene.background = new THREE.Color( 0x808080 )
@@ -463,7 +416,6 @@ const mySVGsMoch = [
         name: "buy-me-a-coffee",
         link: "svg/buy-me-a-coffee.svg"
     },
-
 ]
 
 
@@ -550,7 +502,7 @@ async function func () {
 
         // todo: to abstract
         // todo: create a new array with objects and the name
-
+        // * to get  from the global
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
@@ -602,7 +554,7 @@ async function func () {
         var box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
         var box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
         camera.position.setX(  (box2.max.x+box1.min.x)/2)
-        console.log('w',(box2.max.x+box1.min.x)/2)
+        //console.log('w',(box2.max.x+box1.min.x)/2)
 
         // camera snap position 
 
@@ -616,9 +568,9 @@ async function func () {
 
         //camera.position.lerp(new THREE.Vector3(cameraSnapPosition[1],15,100),.05)
         
-        console.log( cameraSnapPosition[1]- cameraSnapPosition[0] )
+        //console.log( cameraSnapPosition[1]- cameraSnapPosition[0] )
 
-        console.log('cameraSnapPosition:', cameraSnapPosition)
+        //console.log('cameraSnapPosition:', cameraSnapPosition)
 
         // change the camera position on wheel movment 
         // window.addEventListener('wheel', onMouseWheel)
@@ -700,4 +652,98 @@ func ()
 
 
 
+// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
+const titelsURLs = async (arr) => {
+    return await Promise.all(arr.map(async element => {
+        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
+        return { name: element.name, svgLink: SVGURL }
+    }))
+}
 
+
+// * arr is arr of urls  and names
+const getRawTitels = async ( arr ) => {
+    return await Promise.all(arr.map(element => {
+        const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+        const rawSVG = loadSVG(SVGURL)
+
+        return { name: element.name, rawSVG: rawSVG }
+    }))   
+}
+
+// * arra is array of raw svg from firebase storage and  names
+const devidedTitltes = (arr) => {
+    console.log('devidedTitltes', arr)
+    return arr.map(element => {
+        console.log('debug', element.rawSVG)
+        const devidedSVG = splitObject(element.rawSVG)
+        return { name: element.name, devidedSVG: devidedSVG }
+    })
+}
+
+// * arra is array of devided svg from firebase storage and  names
+const materilizedtitles = async (arr) => {
+    return await Promise.all(arr.map(async element => {
+        return {
+            name: element.name, 
+            svg: [ ...element.devidedSVG ], 
+            materilizedSVG: [
+                materilizeSVG(element.devidedSVG[0]),
+                materilizeSVG(element.devidedSVG[1]),
+                materilizeSVG(element.devidedSVG[2])
+            ]
+        }
+    }))
+}
+
+// from firestore
+const getTitelsList = async () => {
+    return  [ 
+        {
+            name: "my-story",
+            link: "svg/my-story.svg"
+        },
+        {
+            name: "my-work",
+            link: "svg/my-work.svg"
+        },
+        {
+            name: "reach-out",
+            link: "svg/reach-out.svg"
+        },
+        {
+            name: "buy-me-a-coffee",
+            link: "svg/buy-me-a-coffee.svg"
+        },
+    ]
+}
+
+
+// * this to abstract the process of get  the svg from firebase storage
+
+const myTitles = async (ojb) => { 
+    const titles = await getTitelsList()
+    const svgURLs = await titelsURLs(titles)
+    const rawTitles = await getRawTitels(svgURLs)
+    const devidedTitles = devidedTitltes(rawTitles)
+    const materilizedTitles = await materilizedtitles(devidedTitles)
+
+    return {
+        ...obj,
+        titles:materilizedTitles
+    }
+}
+
+
+
+
+
+
+
+
+
+console.log('myGlobe1',global)
+
+global = await myTitles(global)
+
+console.log('myGlobe2', global)
