@@ -506,13 +506,13 @@ async function func () {
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
-            //console.log('SVGURL:', SVGURL)
+            console.log('SVGURL:', SVGURL)
 
             const rawSVG = await loadSVG(SVGURL)
-            //console.log('rawSVG:', rawSVG)
+            console.log('rawSVG:', rawSVG)
 
             const devidedSVG = splitObject(rawSVG)
-            // console.log('devidedSVG:', devidedSVG)
+            console.log('devidedSVG:', devidedSVG)
 
             //scene.add( materilizeSVG(devidedSVG[0]))
             return {
@@ -654,6 +654,7 @@ func ()
 
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 const titelsURLs = async (arr) => {
+    console.log("d1", arr)
     return await Promise.all(arr.map(async element => {
         const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
         return { name: element.name, svgLink: SVGURL }
@@ -663,17 +664,17 @@ const titelsURLs = async (arr) => {
 
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
+    console.log("d2", arr)
     return await Promise.all(arr.map(element => {
-        const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+        const SVGURL = element.svgLink
         const rawSVG = loadSVG(SVGURL)
-
         return { name: element.name, rawSVG: rawSVG }
-    }))   
+    })) 
 }
 
 // * arra is array of raw svg from firebase storage and  names
 const devidedTitltes = (arr) => {
-    console.log('devidedTitltes', arr)
+    console.log("d3", arr)
     return arr.map(element => {
         console.log('debug', element.rawSVG)
         const devidedSVG = splitObject(element.rawSVG)
@@ -696,7 +697,8 @@ const materilizedtitles = async (arr) => {
     }))
 }
 
-// from firestore
+// from firestore 
+// ! this is a moch
 const getTitelsList = async () => {
     return  [ 
         {
