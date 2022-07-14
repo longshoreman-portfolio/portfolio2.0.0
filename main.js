@@ -506,13 +506,13 @@ async function func () {
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
-            console.log('SVGURL:', SVGURL)
+            //console.log('SVGURL:', SVGURL)
 
             const rawSVG = await loadSVG(SVGURL)
-            console.log('rawSVG:', rawSVG)
+            //console.log('rawSVG:', rawSVG)
 
             const devidedSVG = splitObject(rawSVG)
-            console.log('devidedSVG:', devidedSVG)
+            //console.log('devidedSVG:', devidedSVG)
 
             //scene.add( materilizeSVG(devidedSVG[0]))
             return {
@@ -665,26 +665,36 @@ const titelsURLs = async (arr) => {
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
     console.log("d2", arr)
-    return await Promise.all(arr.map(element => {
-        const SVGURL = element.svgLink
-        const rawSVG = loadSVG(SVGURL)
+
+    
+    // return [
+    //     { name: arr[0].name, rawSVG:  await loadSVG(arr[0].svgLink) },
+    //     { name: arr[0].name, rawSVG:  await loadSVG(arr[0].svgLink) },
+    //     { name: arr[0].name, rawSVG:  await loadSVG(arr[0].svgLink) }
+
+    // ] 
+    
+
+    
+    return await Promise.all(arr.map( async element => {
+        const rawSVG = loadSVG(element.svgLink)
         return { name: element.name, rawSVG: rawSVG }
     })) 
+    
 }
 
 // * arra is array of raw svg from firebase storage and  names
-const devidedTitltes = (arr) => {
+const devidedTitltes = async (arr) => {
     console.log("d3", arr)
-    return arr.map(element => {
-        console.log('debug', element.rawSVG)
+    return  await Promise.all(arr.map(async element => {
         const devidedSVG = splitObject(element.rawSVG)
         return { name: element.name, devidedSVG: devidedSVG }
-    })
+    }))
 }
 
 // * arra is array of devided svg from firebase storage and  names
 const materilizedtitles = async (arr) => {
-    return await Promise.all(arr.map(async element => {
+    return await Promise.all(arr.map( element => {
         return {
             name: element.name, 
             svg: [ ...element.devidedSVG ], 
@@ -723,11 +733,11 @@ const getTitelsList = async () => {
 
 // * this to abstract the process of get  the svg from firebase storage
 
-const myTitles = async (ojb) => { 
+const myTitles = async (obj) => { 
     const titles = await getTitelsList()
     const svgURLs = await titelsURLs(titles)
     const rawTitles = await getRawTitels(svgURLs)
-    const devidedTitles = devidedTitltes(rawTitles)
+    const devidedTitles = await devidedTitltes(rawTitles)
     const materilizedTitles = await materilizedtitles(devidedTitles)
 
     return {
