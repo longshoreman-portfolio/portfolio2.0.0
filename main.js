@@ -77,22 +77,7 @@ const renderer = new THREE.WebGLRenderer({
 const scene = new THREE.Scene()
 
 
-/** Objects */
-// Torus
-const geometryTorus = new THREE.TorusGeometry(10, 2.8, 30, 200)
-
-// Sphere
-const geometrySphere = new THREE.SphereGeometry(3.5, 30, 30)
-
-//Big Cube 
-const geometryCube = new  boxWithRoundedEdges(10, 10, 10, 2, 6, 2)
-
-//Small Cube
-const geometrySmallCube = new  boxWithRoundedEdges(3, 3, 3, 0.5, 6, 2)
-
-//Cylinder
-const points = cylinderWithroundedendge(4,9,1,10)
-const geometryCylinder = new THREE.LatheGeometry(  points ,50)
+/
 
 /** Materials */
 const darkMaterial = new THREE.MeshStandardMaterial({color:0x111111})
@@ -101,51 +86,11 @@ const greenMaterial = new THREE.MeshStandardMaterial({color:0x00995c, side: THRE
 const orangeMaterial = new THREE.MeshStandardMaterial({color:0xb36b00, side: THREE.DoubleSide})
 
 /** Mesh */
-//torus
-const torus = new THREE.Mesh(geometryTorus, darkMaterial)
-torus.position.set(20, -9, 0)           //TODO: not sure where to put this
-scene.add(torus)
 
-// Sphere
-const sphere = new THREE.Mesh(geometrySphere, purpleMaterial)
-sphere.position.set(30, 10, -20)        //TODO: not sure where to put this
-scene.add(sphere)
-
-//Big Cube
-const cube = new THREE.Mesh(geometryCube, darkMaterial)
-cube.position.set(15, 5, -30)
-
-cube.rotation.x = 10
-cube.rotation.y = 10
-cube.rotation.z = 10
-
-scene.add(cube)
-
-//Small Cube
-const smallCube = new THREE.Mesh(geometrySmallCube, greenMaterial)
-smallCube.position.set(20, -9, 0)
-
-smallCube.rotation.x = -40
-smallCube.rotation.y = -20
-smallCube.rotation.z = 20
-
-scene.add(smallCube)
-
-//Cylinder
-const cylinder = new THREE.Mesh( geometryCylinder, orangeMaterial )
-cylinder.position.set(-4, -10, -20)
-
-cylinder.rotation.x = 50
-cylinder.rotation.y = 50
-cylinder.rotation.z = 50
-
-cylinder.scale.set(1, 1, 1);
-scene.add( cylinder );
-
-/** import icon example */ 
 
 
 
+/** import icon example */ 
 
 
 
@@ -164,8 +109,6 @@ pointLightPurple.position.set(30, 10, -20)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
-
-
 
 
 scene.add( gridHelper )
