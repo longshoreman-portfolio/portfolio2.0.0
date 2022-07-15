@@ -506,15 +506,12 @@ async function func () {
         const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
             const SVGURL = await storageURL( routes, targetEnverment ) + element.link
-            console.log('SVGURL:', SVGURL)
+
 
             const rawSVG = await loadSVG(SVGURL)
-            console.log('rawSVG:', rawSVG)
 
             const devidedSVG = splitObject(rawSVG)
-            console.log('devidedSVG:', devidedSVG)
 
-            //scene.add( materilizeSVG(devidedSVG[0]))
             return {
                 name: element.name, 
                 svg: [ ...devidedSVG ], 
@@ -535,6 +532,7 @@ async function func () {
             {n: value}
         }
 
+        // add the svg to the scene and scale middle section
         for(let i = 0; i < myTitelsSVGs.length; i++) {
             for ( let j = 0; j < 3; j++ ) {
                 myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100)
@@ -543,21 +541,19 @@ async function func () {
             }
         }
 
-       
+        //  translate the midle section and the last section
         var box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
         var box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
         arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
         arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
 
 
-         //center camera on the model
+        //center camera on the model
         var box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
         var box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
         camera.position.setX(  (box2.max.x+box1.min.x)/2)
-        //console.log('w',(box2.max.x+box1.min.x)/2)
 
         // camera snap position 
-
         cameraSnapPosition = myTitelsSVGs.map(
             (element) => {  
                 var box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
@@ -565,22 +561,6 @@ async function func () {
                 return  (box2.max.x+box1.min.x)/2
             }
         )
-
-        //camera.position.lerp(new THREE.Vector3(cameraSnapPosition[1],15,100),.05)
-        
-        //console.log( cameraSnapPosition[1]- cameraSnapPosition[0] )
-
-        //console.log('cameraSnapPosition:', cameraSnapPosition)
-
-        // change the camera position on wheel movment 
-        // window.addEventListener('wheel', onMouseWheel)
-        // let Y = 0
-        // let position = 0
-
-        // function onMouseWheel (event) {
-        //     console.log(event.deltaY) 
-        //     (event.deltaY > 0) ? position = position + 1 : position = position - 1
-        // }
 
 
 
@@ -641,6 +621,8 @@ func ()
 // ! important  create three js carousel function that takes svgs and elements and add to the scene carousel  
 // * spec: 
 
+// ! important handle the waiting time  when loading ... all stuff use the xhr
+
 
 
 // * doc 
@@ -654,7 +636,6 @@ func ()
 
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 const titelsURLs = async (arr) => {
-    console.log("d1", arr)
     return await Promise.all(arr.map(async element => {
         const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
         return { name: element.name, svgLink: SVGURL }
@@ -664,27 +645,23 @@ const titelsURLs = async (arr) => {
 
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
-    console.log("d2", arr)
-    return await Promise.all(arr.map(element => {
-        const SVGURL = element.svgLink
-        const rawSVG = loadSVG(SVGURL)
+    return await Promise.all(arr.map( async element => {
+        const rawSVG = await loadSVG(element.svgLink)
         return { name: element.name, rawSVG: rawSVG }
     })) 
 }
 
 // * arra is array of raw svg from firebase storage and  names
-const devidedTitltes = (arr) => {
-    console.log("d3", arr)
-    return arr.map(element => {
-        console.log('debug', element.rawSVG)
+const devidedTitltes = async (arr) => {
+    return  await Promise.all(arr.map(async element => {
         const devidedSVG = splitObject(element.rawSVG)
         return { name: element.name, devidedSVG: devidedSVG }
-    })
+    }))
 }
 
 // * arra is array of devided svg from firebase storage and  names
 const materilizedtitles = async (arr) => {
-    return await Promise.all(arr.map(async element => {
+    return await Promise.all(arr.map( element => {
         return {
             name: element.name, 
             svg: [ ...element.devidedSVG ], 
@@ -696,6 +673,21 @@ const materilizedtitles = async (arr) => {
         }
     }))
 }
+
+
+// todo: add the svg to the scene function 
+// todo: scale function 
+// todo: lerp function
+// todo: camera positions function
+// todo: camera movment function
+// todo: camera move by scroll function
+// todo: camera move by nav bar link function
+// todo: camera move by swipe function
+
+// ! scale function starts form 0 go up to 1 then down to 0
+
+
+
 
 // from firestore 
 // ! this is a moch
@@ -723,11 +715,11 @@ const getTitelsList = async () => {
 
 // * this to abstract the process of get  the svg from firebase storage
 
-const myTitles = async (ojb) => { 
+const myTitles = async (obj) => { 
     const titles = await getTitelsList()
     const svgURLs = await titelsURLs(titles)
     const rawTitles = await getRawTitels(svgURLs)
-    const devidedTitles = devidedTitltes(rawTitles)
+    const devidedTitles = await devidedTitltes(rawTitles)
     const materilizedTitles = await materilizedtitles(devidedTitles)
 
     return {
@@ -736,15 +728,6 @@ const myTitles = async (ojb) => {
     }
 }
 
-
-
-
-
-
-
-
-
-console.log('myGlobe1',global)
 
 global = await myTitles(global)
 
