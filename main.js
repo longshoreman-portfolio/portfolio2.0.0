@@ -32,15 +32,117 @@ import { async } from '@firebase/util'
 var global = {
     camera: {position: new THREE.Vector3(0,15,100)},
     titles: [],
-    cameraSnapPosition: [] 
+    cameraSnapPositions: [],
+    //middleSectionState: []
 }
 
 const changeCameraSnapPosition = ( arr ) => {
-    global.cameraSnapPosition = [...arr]
+    global.cameraSnapPositions = [...arr]
 }
 
 
 
+
+
+
+
+
+
+// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
+const titelsURLs = async (arr) => {
+    return await Promise.all(arr.map(async element => {
+        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
+        return { name: element.name, svgLink: SVGURL }
+    }))
+}
+
+
+// * arr is arr of urls  and names
+const getRawTitels = async ( arr ) => {
+    return await Promise.all(arr.map( async element => {
+        const rawSVG = await loadSVG(element.svgLink)
+        return { name: element.name, rawSVG: rawSVG }
+    })) 
+}
+
+// * arra is array of raw svg from firebase storage and  names
+const devidedTitltes = async (arr) => {
+    return  await Promise.all(arr.map(async element => {
+        const devidedSVG = splitObject(element.rawSVG)
+        return { name: element.name, devidedSVG: devidedSVG }
+    }))
+}
+
+// * arra is array of devided svg from firebase storage and  names
+const materilizedtitles = async (arr) => {
+    return await Promise.all(arr.map( element => {
+        return {
+            name: element.name, 
+            svg: [ ...element.devidedSVG ], 
+            materilizedSVG: [
+                materilizeSVG(element.devidedSVG[0]),
+                materilizeSVG(element.devidedSVG[1]),
+                materilizeSVG(element.devidedSVG[2])
+            ]
+        }
+    }))
+}
+
+
+
+
+// todo: add the svg to the scene function 
+// todo: scale function 
+// todo: lerp function
+// todo: camera positions function
+// todo: camera movment function
+// todo: camera move by scroll function
+// todo: camera move by nav bar link function
+// todo: camera move by swipe function
+
+// ! scale function starts form 0 go up to 1 then down to 0
+
+
+
+
+// from firestore 
+// ! this is a moch
+const getTitelsList = async () => {
+    return  [ 
+        {
+            name: "my-story",
+            link: "svg/my-story.svg"
+        },
+        {
+            name: "my-work",
+            link: "svg/my-work.svg"
+        },
+        {
+            name: "reach-out",
+            link: "svg/reach-out.svg"
+        },
+        {
+            name: "buy-me-a-coffee",
+            link: "svg/buy-me-a-coffee.svg"
+        },
+    ]
+}
+
+
+// * this to abstract the process of get  the svg from firebase storage
+
+const myTitles = async (obj) => { 
+    const titles = await getTitelsList()
+    const svgURLs = await titelsURLs(titles)
+    const rawTitles = await getRawTitels(svgURLs)
+    const devidedTitles = await devidedTitltes(rawTitles)
+    const materilizedTitles = await materilizedtitles(devidedTitles)
+
+    return {
+        ...obj,
+        titles:materilizedTitles
+    }
+}
 
  
 
@@ -48,13 +150,13 @@ const changeCameraSnapPosition = ( arr ) => {
 /** texture loader  */
 
 /** Debug */
-const size = 200
+const size = 800
 const divisions = 10
 const gridHelper = new THREE.GridHelper( size, divisions )
 
 
 
-var cameraSnapPosition = []
+var cameraSnapPositions = []
 var titles = []
 console.log( titles )
 
@@ -77,13 +179,13 @@ const renderer = new THREE.WebGLRenderer({
 const scene = new THREE.Scene()
 
 
-/
+
 
 /** Materials */
-const darkMaterial = new THREE.MeshStandardMaterial({color:0x111111})
-const purpleMaterial = new THREE.MeshStandardMaterial({color:0x4d0099})
-const greenMaterial = new THREE.MeshStandardMaterial({color:0x00995c, side: THREE.DoubleSide})
-const orangeMaterial = new THREE.MeshStandardMaterial({color:0xb36b00, side: THREE.DoubleSide})
+// const darkMaterial = new THREE.MeshStandardMaterial({color:0x111111})
+// const purpleMaterial = new THREE.MeshStandardMaterial({color:0x4d0099})
+// const greenMaterial = new THREE.MeshStandardMaterial({color:0x00995c, side: THREE.DoubleSide})
+// const orangeMaterial = new THREE.MeshStandardMaterial({color:0xb36b00, side: THREE.DoubleSide})
 
 /** Mesh */
 
@@ -204,40 +306,22 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         requestAnimationFrame(animateLoop)
     
         /** Animate torus */
-        torus.rotation.x += 0.01
-        torus.rotation.y += 0.005
-        torus.rotation.z += 0.01
+
     
         /** Animate Cylinder */
-        cylinder.rotation.x += 0.01
-        cylinder.rotation.y += 0.03
+
     
         /** Animate cube */
         /** Cube translation */
-        cubeDiractionX ? cube.position.x -= 0.05 : cube.position.x += 0.05
-        cube.position.x >= 15 ? cubeDiractionX = true : null
-        cube.position.x <= -5 ? cubeDiractionX = false : null
-    
-        cubeDiractionY ? cube.position.y -= 0.05 : cube.position.y += 0.05
-        cube.position.y >= 15 ? cubeDiractionY = true : null
-        cube.position.y <= -5 ? cubeDiractionY = false : null
     
         /** Cube rotation */
-        cube.rotation.x += 0.01
-        cube.rotation.y += 0.01
-        cube.rotation.z += 0.01
+
     
         /** Animate small cube */
-        smallCube.rotation.x += 0.005
-        smallCube.rotation.y += 0.005
-        smallCube.rotation.z += 0.005
+
     
         /** Animation shpere */
-        shpereGrowing ? sphere.scale.x += 0.001 : sphere.scale.x -= 0.001
-        shpereGrowing ? sphere.scale.y += 0.001 : sphere.scale.y -= 0.001
-        shpereGrowing ? sphere.scale.z += 0.001 : sphere.scale.z -= 0.001
-        sphere.scale.x >= 1.4 ? shpereGrowing = false : null
-        sphere.scale.x <= 0.6 ? shpereGrowing = true : null
+
     
         renderer.render(scene, camera)
         i += 1
@@ -248,8 +332,11 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         j === 4     ?   j=0 :   null
 
 
-
-        camera.position.lerp(new THREE.Vector3(cameraSnapPosition[j],15,100),.05)
+        // todo abstract to function 
+        camera.position.lerp(new THREE.Vector3(cameraSnapPositions[j],15,100),.05)
+        
+        // ! here go the scale function for the middle section
+       // manageMiddleSection( j )
 
         
 
@@ -428,15 +515,13 @@ async () => {
 
 
 
-const mySVGRef = ref( appStorage, 'about-me.svg')
-
 
 
 async function func () {
     // todo abstract this to a function
     if (targetEnverment() === "emulator") {
         connectStorageEmulator( appStorage, "localhost", 9199)
-        const SVGURL = await fetchDownloadURL(mySVGRef)
+        //const SVGURL = await fetchDownloadURL(mySVGRef)
         //loadSVG(SVGURL)
         
     }
@@ -446,29 +531,33 @@ async function func () {
         // todo: to abstract
         // todo: create a new array with objects and the name
         // * to get  from the global
-        const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
+
+        //global = await myTitles(global)
+        let  myTitelsSVGs = global.titles
+
+        // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
-            const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+        //     const SVGURL = await storageURL( routes, targetEnverment ) + element.link
 
 
-            const rawSVG = await loadSVG(SVGURL)
+        //     const rawSVG = await loadSVG(SVGURL)
 
-            const devidedSVG = splitObject(rawSVG)
+        //     const devidedSVG = splitObject(rawSVG)
 
-            return {
-                name: element.name, 
-                svg: [ ...devidedSVG ], 
-                materilizedSVG: [
-                    materilizeSVG(devidedSVG[0]),
-                    materilizeSVG(devidedSVG[1]),
-                    materilizeSVG(devidedSVG[2])
-                ]
-            }
-        }))
+        //     return {
+        //         name: element.name, 
+        //         svg: [ ...devidedSVG ], 
+        //         materilizedSVG: [
+        //             materilizeSVG(devidedSVG[0]),
+        //             materilizeSVG(devidedSVG[1]),
+        //             materilizeSVG(devidedSVG[2])
+        //         ]
+        //     }
+        // }))
 
 
         /** init */
-        var proprtion = {n: 1}
+        var proprtion = {n: .01}
         var arr = myTitelsSVGs[0]
         titles = [...myTitelsSVGs]
         const changeProprtion = (value) => {
@@ -478,17 +567,21 @@ async function func () {
         // add the svg to the scene and scale middle section
         for(let i = 0; i < myTitelsSVGs.length; i++) {
             for ( let j = 0; j < 3; j++ ) {
+                // todo change the 100 to be proprtional to the screen size
                 myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100)
-                j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
+               // j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
                 scene.add(myTitelsSVGs[i].materilizedSVG[j])
             }
         }
 
+        
+
         //  translate the midle section and the last section
-        var box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
-        var box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
-        arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
-        arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
+        // var box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
+        // var box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+        // arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
+        // arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
+
 
 
         //center camera on the model
@@ -496,24 +589,25 @@ async function func () {
         var box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
         camera.position.setX(  (box2.max.x+box1.min.x)/2)
 
-        // camera snap position 
-        cameraSnapPosition = myTitelsSVGs.map(
+
+        // camera snap positions
+        cameraSnapPositions = myTitelsSVGs.map(
             (element) => {  
                 var box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
                 var box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
                 return  (box2.max.x+box1.min.x)/2
             }
         )
+        console.log(cameraSnapPositions)
+        
+        global = {...global, cameraSnapPositions: [...cameraSnapPositions]}
 
 
 
-        const scaleMidleSection = ( SVGTitle , n ) => {
-            var box = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
-            var box3 = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
-            SVGTitle.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/n - box.min.x+box3.min.x) // how much to translate midel section 
-            SVGTitle.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-n)/n )   // how much  to translate the last part     
-        }
 
+
+        
+        
 
 
         /** when change */
@@ -544,6 +638,11 @@ async function func () {
     }
 }
 
+
+const mySVGRef = ref( appStorage, 'about-me.svg')
+
+global = await myTitles(global)
+console.log(global)
 func ()
 
 
@@ -573,105 +672,30 @@ func ()
 // normal 
 
 
+const manageMiddleSection = ( n ) => {
 
-
-
-
-// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
-const titelsURLs = async (arr) => {
-    return await Promise.all(arr.map(async element => {
-        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
-        return { name: element.name, svgLink: SVGURL }
-    }))
 }
 
 
-// * arr is arr of urls  and names
-const getRawTitels = async ( arr ) => {
-    return await Promise.all(arr.map( async element => {
-        const rawSVG = await loadSVG(element.svgLink)
-        return { name: element.name, rawSVG: rawSVG }
-    })) 
+const scaleMidleSection = ( SVGTitle , n ) => {
+    SVGTitle.materilizedSVG[1].scale.setX(n)
+    var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
+    SVGTitle.materilizedSVG[1].translateX( (middleSectionRange.min.x-lastSectionRange.min.x)/n - middleSectionRange.min.x+lastSectionRange.min.x) // how much to translate midel section 
+    SVGTitle.materilizedSVG[0].translateX( -(middleSectionRange.max.x - middleSectionRange.min.x)*(1-n)/n )   // how much  to translate the last part
 }
 
-// * arra is array of raw svg from firebase storage and  names
-const devidedTitltes = async (arr) => {
-    return  await Promise.all(arr.map(async element => {
-        const devidedSVG = splitObject(element.rawSVG)
-        return { name: element.name, devidedSVG: devidedSVG }
-    }))
-}
-
-// * arra is array of devided svg from firebase storage and  names
-const materilizedtitles = async (arr) => {
-    return await Promise.all(arr.map( element => {
-        return {
-            name: element.name, 
-            svg: [ ...element.devidedSVG ], 
-            materilizedSVG: [
-                materilizeSVG(element.devidedSVG[0]),
-                materilizeSVG(element.devidedSVG[1]),
-                materilizeSVG(element.devidedSVG[2])
-            ]
-        }
-    }))
+const centerCameraOnTitle = ( SVGTitle ) => {
+    var firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+    var lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+    camera.position.setX(  (firstSectionRange.max.x + lastSectionRange.min.x)/2)
 }
 
 
-// todo: add the svg to the scene function 
-// todo: scale function 
-// todo: lerp function
-// todo: camera positions function
-// todo: camera movment function
-// todo: camera move by scroll function
-// todo: camera move by nav bar link function
-// todo: camera move by swipe function
 
-// ! scale function starts form 0 go up to 1 then down to 0
+
+// todo make all middle section null 
+global.titles.length!==0?  global.titles.forEach(element => {scaleMidleSection(element,1)}) : null
 
 
 
-
-// from firestore 
-// ! this is a moch
-const getTitelsList = async () => {
-    return  [ 
-        {
-            name: "my-story",
-            link: "svg/my-story.svg"
-        },
-        {
-            name: "my-work",
-            link: "svg/my-work.svg"
-        },
-        {
-            name: "reach-out",
-            link: "svg/reach-out.svg"
-        },
-        {
-            name: "buy-me-a-coffee",
-            link: "svg/buy-me-a-coffee.svg"
-        },
-    ]
-}
-
-
-// * this to abstract the process of get  the svg from firebase storage
-
-const myTitles = async (obj) => { 
-    const titles = await getTitelsList()
-    const svgURLs = await titelsURLs(titles)
-    const rawTitles = await getRawTitels(svgURLs)
-    const devidedTitles = await devidedTitltes(rawTitles)
-    const materilizedTitles = await materilizedtitles(devidedTitles)
-
-    return {
-        ...obj,
-        titles:materilizedTitles
-    }
-}
-
-
-global = await myTitles(global)
-
-console.log('myGlobe2', global)
