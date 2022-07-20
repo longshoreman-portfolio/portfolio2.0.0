@@ -94,10 +94,9 @@ const scaleMidleSection = ( SVGTitle , n ) => {
     SVGTitle.materilizedSVG[1].scale.setX(n)
     var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
-    SVGTitle.materilizedSVG[1].translateX( (middleSectionRange.min.x-lastSectionRange.min.x)/n - middleSectionRange.min.x+lastSectionRange.min.x) // how much to translate midel section 
+    SVGTitle.materilizedSVG[1].translateX( (middleSectionRange.min.x - lastSectionRange.min.x)/n - middleSectionRange.min.x + lastSectionRange.min.x) // how much to translate midel section 
     SVGTitle.materilizedSVG[0].translateX( -(middleSectionRange.max.x - middleSectionRange.min.x)*(1-n)/n )   // how much  to translate the last part
 }
-
 
 
 
@@ -343,9 +342,12 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         console.log(camera.position)
         // * when the animation starts : when the j changes 
         // todo scale up to 1 in linear way
-        //global.titles.forEach(element => {scaleMidleSection(element, (i+1)/400)})
 
+        global.titles.forEach(element => {scaleMidleSection(element, .01)})
 
+        
+
+        
         // * when the animation ends : when  camera.position === is a const 
         // todo scale down to 0.01 in linear way
 
@@ -703,7 +705,8 @@ const centerCameraOnTitle = ( SVGTitle ) => {
 
 
 // todo make all middle section null 
-global.titles.length!==0?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
+//global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
 
 
+//scaleMidleSection(global.titles[0], .01)
 
