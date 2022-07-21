@@ -91,11 +91,16 @@ const materilizedtitles = async (arr) => {
 
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
+
+    //! problem happens here 'cause the scale is recursive  to solve it we need to call it once
+    
     SVGTitle.materilizedSVG[1].scale.setX(n)
     var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
     SVGTitle.materilizedSVG[1].translateX( (middleSectionRange.min.x - lastSectionRange.min.x)/n - middleSectionRange.min.x + lastSectionRange.min.x) // how much to translate midel section 
     SVGTitle.materilizedSVG[0].translateX( -(middleSectionRange.max.x - middleSectionRange.min.x)*(1-n)/n )   // how much  to translate the last part
+    console.log('how much to translate midel section =',(middleSectionRange.min.x - lastSectionRange.min.x)/n - middleSectionRange.min.x + lastSectionRange.min.x)
+    
 }
 
 
@@ -302,6 +307,9 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     var shpereGrowing = true
     var i = 0
     var j = 0
+    var x = 0
+    var y = 0
+    var dontDoIt=false
 
     function animateLoop() {
 
@@ -336,24 +344,77 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
 
         // todo abstract to function 
-        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,100),.05)
+        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,100),.03)
 
 
-        console.log(camera.position)
-        // * when the animation starts : when the j changes 
+       // console.log(camera.position)
+        // * when the animation starts : when the j changes when the i = 0
+        global.titles.length!==0 && i===0 ?   console.log('scale up')  : null
+        i===0 ?  dontDoIt=true : null
+        
+
+
+
+        //! (i+1)/400) is not working
         // todo scale up to 1 in linear way
 
-        global.titles.forEach(element => {scaleMidleSection(element, .01)})
-
+        //global.titles.forEach(element => {scaleMidleSection(element, 1.001)})
         
 
-        
+        //scaleMidleSection(global.titles[0], (i+1)/400)
+
+        //global.titles.length!==0 ?  scaleMidleSection(global.titles[0], 1) : null
+
+
         // * when the animation ends : when  camera.position === is a const 
         // todo scale down to 0.01 in linear way
 
         // ! here go the scale function for the middle section
        // manageMiddleSection( j )
+       
 
+        if (i % 50 === 0) { 
+
+            
+            x = camera.position.x - camera.position.x % 1
+            
+            //console.log('x',x -(camera.position.x - camera.position.x % 1))
+
+            
+        }
+            
+          
+        if (i % 60 === 0) { 
+            y =  camera.position.x - camera.position.x % 1
+
+
+            //console.log('y',y -(camera.position.x - camera.position.x % 1))
+        }
+
+
+
+        // console.log('x',x -(camera.position.x - camera.position.x % 1))
+        // console.log('y',y -(camera.position.x - camera.position.x % 1))
+        if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && dontDoIt){
+            
+
+            console.log('scale down')
+            dontDoIt=false
+        }
+
+
+
+         
+            // console.log('x',x )
+            // console.log('y',y )
+            // console.log('camera',camera.position.x)
+    
+        
+        
+
+        
+
+        
         
 
 
@@ -705,7 +766,7 @@ const centerCameraOnTitle = ( SVGTitle ) => {
 
 
 // todo make all middle section null 
-//global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
+global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
 
 
 //scaleMidleSection(global.titles[0], .01)
