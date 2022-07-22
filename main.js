@@ -92,15 +92,31 @@ const materilizedtitles = async (arr) => {
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
 
-    //! problem happens here 'cause the scale is recursive  to solve it we need to call it once
+    
+    // ! fix the scale  or the translate 
+
+
+    var firstSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
+    var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
+    var sizeOfmiddleSection = middleSectionRange.max.x - firstSectionRange.max.x
+    
+    
+    
     
     SVGTitle.materilizedSVG[1].scale.setX(n)
-    var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
-    var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
-    SVGTitle.materilizedSVG[1].translateX( (middleSectionRange.min.x - lastSectionRange.min.x)/n - middleSectionRange.min.x + lastSectionRange.min.x) // how much to translate midel section 
-    SVGTitle.materilizedSVG[0].translateX( -(middleSectionRange.max.x - middleSectionRange.min.x)*(1-n)/n )   // how much  to translate the last part
-    console.log('how much to translate midel section =',(middleSectionRange.min.x - lastSectionRange.min.x)/n - middleSectionRange.min.x + lastSectionRange.min.x)
+   
+
+
+    var translateMiddleSectionBy  =  (firstSectionRange.max.x-firstSectionRange.min.x) * (1-n)
+    // how much to translate midel section 
+    SVGTitle.materilizedSVG[1].translateX(translateMiddleSectionBy)
     
+    
+    var translateLastSectionBy = -sizeOfmiddleSection*(1-n)
+    // how much  to translate the last part
+    SVGTitle.materilizedSVG[0].translateX(translateLastSectionBy)
+    console.log(translateLastSectionBy)
 }
 
 
@@ -349,7 +365,12 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
        // console.log(camera.position)
         // * when the animation starts : when the j changes when the i = 0
-        global.titles.length!==0 && i===0 ?   console.log('scale up')  : null
+        if( global.titles.length!==0 && i===0 ){
+            console.log('scale up') 
+           // global.titles.forEach(element => {scaleMidleSection(element,1)})
+        }  
+
+
         i===0 ?  dontDoIt=true : null
         
 
@@ -374,21 +395,12 @@ camera.lookAt(new THREE.Vector3(0,0,0))
        
 
         if (i % 50 === 0) { 
-
-            
             x = camera.position.x - camera.position.x % 1
-            
-            //console.log('x',x -(camera.position.x - camera.position.x % 1))
-
-            
         }
             
           
         if (i % 60 === 0) { 
             y =  camera.position.x - camera.position.x % 1
-
-
-            //console.log('y',y -(camera.position.x - camera.position.x % 1))
         }
 
 
@@ -396,8 +408,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         // console.log('x',x -(camera.position.x - camera.position.x % 1))
         // console.log('y',y -(camera.position.x - camera.position.x % 1))
         if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && dontDoIt){
-            
-
+           //global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
             console.log('scale down')
             dontDoIt=false
         }
@@ -416,7 +427,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
         
         
-
+            
 
         // todo make illusion of infinty loop (how to do it when the new obj can be seen whit odl one)
         // * idea what if i teleport the first object to after the last one and then teleport it back with the camera to the beginning
@@ -689,19 +700,7 @@ async function func () {
 
         /** when change */
 
-        gui.add(proprtion,'n', 0.05,1).step(.05).onChange((value) => {
-            changeProprtion(value)
-            for(let i = 0; i < myTitelsSVGs.length; i++) {
-                for ( let j = 0; j < 3; j++ ) {
-                    myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100 -200)
-                    j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
-                }
-            }
-            myTitelsSVGs.forEach(element => {
-                scaleMidleSection(element, proprtion.n )
-            })
-        
-        }) 
+       
 
 
     }
@@ -766,8 +765,13 @@ const centerCameraOnTitle = ( SVGTitle ) => {
 
 
 // todo make all middle section null 
-global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
+global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.5)}) : null
 
+
+global.titles.length!==0 ?  global.titles.forEach(element => {
+    scaleMidleSection(element,.5)
+    
+}) : null
 
 //scaleMidleSection(global.titles[0], .01)
 
