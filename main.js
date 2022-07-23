@@ -228,7 +228,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
 
 
-scene.add( gridHelper )
+//scene.add( gridHelper )
 
 /** Sizes */
 
@@ -267,7 +267,7 @@ window.addEventListener('resize', () =>
     const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
-    camera.position.setZ(100)
+    camera.position.setZ(50)
     camera.position.setY(15)
     camera.position.setX(0)
 /** Renderer */
@@ -352,7 +352,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
 
         // todo abstract to function 
-        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,100),.03)
+        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,50),.02)
 
       
         
@@ -420,18 +420,18 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
         if(startScaleUp) {
             k++
-
+            if(k<=50){
+                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,0.02*k)}) : null
+            }
         }
 
         if(startScaleDown && k<=100) {
             k++
-            var p = 1
-            if(k<=50) {
-                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,-0.0002*k*k+1)}) : null
-            }
-            if(k>=50) {
-                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,1/14900*(k*(1-k)+9900))}) : null
-            }
+            global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,/*-0.0002*k*k+1*/-0.01*k+1)}) : null
+            
+            // if(k>=50) {
+            //     global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,1/14900*(k*(1-k)+9900))}) : null
+            // }
             
         }
 
