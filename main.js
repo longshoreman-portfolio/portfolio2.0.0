@@ -92,31 +92,22 @@ const materilizedtitles = async (arr) => {
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
 
-    
-    // ! fix the scale  or the translate 
-
-
-    var firstSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[2] )
     var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
-    var sizeOfmiddleSection = middleSectionRange.max.x - firstSectionRange.max.x
-    
-    
-    
-    
+
     SVGTitle.materilizedSVG[1].scale.setX(n)
-   
+    
+    var newMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
 
 
-    var translateMiddleSectionBy  =  (firstSectionRange.max.x-firstSectionRange.min.x) * (1-n)
+    var translateMiddleSectionBy  = newMiddleSectionRange.min.x - middleSectionRange.min.x
     // how much to translate midel section 
-    SVGTitle.materilizedSVG[1].translateX(translateMiddleSectionBy)
+    SVGTitle.materilizedSVG[1].translateX(-translateMiddleSectionBy)
+    var newestMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     
-    
-    var translateLastSectionBy = -sizeOfmiddleSection*(1-n)
+    var translateLastSectionBy = newestMiddleSectionRange.max.x - lastSectionRange.min.x
     // how much  to translate the last part
     SVGTitle.materilizedSVG[0].translateX(translateLastSectionBy)
-    console.log(translateLastSectionBy)
 }
 
 
@@ -317,15 +308,16 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
 
     /** Animation loop */
-    var cubeDiractionX = false
-    var cubeDiractionY = false
 
-    var shpereGrowing = true
     var i = 0
     var j = 0
+    var k = 1
     var x = 0
     var y = 0
-    var dontDoIt=false
+    var executeOnce=false
+    var startScaleUp = false
+    var startScaleDown = false
+
 
     function animateLoop() {
 
@@ -351,7 +343,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
     
         renderer.render(scene, camera)
-        i += 1
+        i++
         //console.log(j)
         i === 400   ?   i=0 :   null
         i === 0     ?   j++ :   null
@@ -362,16 +354,24 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         // todo abstract to function 
         camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,100),.03)
 
+      
+        
+
 
        // console.log(camera.position)
         // * when the animation starts : when the j changes when the i = 0
         if( global.titles.length!==0 && i===0 ){
             console.log('scale up') 
-           // global.titles.forEach(element => {scaleMidleSection(element,1)})
+            k=1
+            global.titles.forEach(element => {scaleMidleSection(element,1)})
+            startScaleUp = true
+            startScaleDown = false
         }  
 
 
-        i===0 ?  dontDoIt=true : null
+
+
+        i===0 ?  executeOnce=true : null
         
 
 
@@ -407,10 +407,32 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
         // console.log('x',x -(camera.position.x - camera.position.x % 1))
         // console.log('y',y -(camera.position.x - camera.position.x % 1))
-        if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && dontDoIt){
-           //global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
+        if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && executeOnce){
+           
             console.log('scale down')
-            dontDoIt=false
+            k=1
+            startScaleUp=false
+            startScaleDown = true
+            executeOnce=false
+        }
+
+
+
+        if(startScaleUp) {
+            k++
+
+        }
+
+        if(startScaleDown && k<=100) {
+            k++
+            var p = 1
+            if(k<=50) {
+                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,-0.0002*k*k+1)}) : null
+            }
+            if(k>=50) {
+                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,1/14900*(k*(1-k)+9900))}) : null
+            }
+            
         }
 
 
@@ -765,13 +787,15 @@ const centerCameraOnTitle = ( SVGTitle ) => {
 
 
 // todo make all middle section null 
-global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.5)}) : null
+global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
 
 
-global.titles.length!==0 ?  global.titles.forEach(element => {
-    scaleMidleSection(element,.5)
+// global.titles.length!==0 ?  global.titles.forEach(element => {
+//     scaleMidleSection(element,.5)
     
-}) : null
+// }) : null
+
+
 
 //scaleMidleSection(global.titles[0], .01)
 
