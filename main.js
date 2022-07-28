@@ -30,11 +30,12 @@ import { async } from '@firebase/util'
 /** global */
 
 var global = {
-    camera: {position: new THREE.Vector3(0,15,100)},
+    camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
     cameraSnapPositions: [],
     //middleSectionState: []
 }
+
 
 const changeCameraSnapPosition = ( arr ) => {
     global.cameraSnapPositions = [...arr]
@@ -228,7 +229,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
 
 
-//scene.add( gridHelper )
+scene.add( gridHelper )
 
 /** Sizes */
 
@@ -245,8 +246,8 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () =>{
+
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -258,6 +259,7 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
 })
  
 
@@ -267,9 +269,9 @@ window.addEventListener('resize', () =>
     const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
-    camera.position.setZ(50)
-    camera.position.setY(15)
-    camera.position.setX(0)
+    camera.position.setZ(global.camera.position.z)
+    camera.position.setY(global.camera.position.y)
+    camera.position.setX(global.camera.position.x)
 /** Renderer */
 
 
@@ -352,7 +354,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
 
         // todo abstract to function 
-        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],15,50),.02)
+        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],camera.position.y,camera.position.z),.02)
 
       
         
@@ -799,3 +801,6 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 //scaleMidleSection(global.titles[0], .01)
 
+
+
+// todo romove buy me coffee then 
