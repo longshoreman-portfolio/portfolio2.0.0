@@ -804,3 +804,7 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 
 // todo romove buy me coffee then 
+
+// todo grab to move 
+
+// todo rotate the titels so it looks vertical 
