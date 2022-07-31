@@ -808,3 +808,6 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 // todo grab to move 
 
 // todo rotate the titels so it looks vertical 
+
+
+// todo change the lerp function of the camera movement to a new the easy in easy out function
