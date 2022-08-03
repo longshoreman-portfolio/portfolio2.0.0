@@ -46,7 +46,16 @@ const changeCameraSnapPosition = ( arr ) => {
 
 
 
-
+function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
+    t = currentTime
+    b = startValue
+    c = changeInValue
+    d = duration
+    t /= d/2;
+    if (t < 1) return c/2*t*t + b;
+    t--;
+    return -c/2 * (t*(t-2) - 1) + b;
+};
 
 
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
