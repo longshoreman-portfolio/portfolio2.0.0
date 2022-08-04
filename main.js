@@ -58,6 +58,51 @@ function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
 };
 
 
+/** test more in diff env */
+/**
+ * 
+ <!doctype html>
+<html>
+<head>
+   <style>
+      #movingDiv {
+         position: relative;
+         width: 200px;
+         height: 200px;
+      }
+   </style>
+</head>
+<body>
+   <div id="movingDiv"> This is my moving div! </div>
+   <script>
+   
+   	var div = document.getElementById("movingDiv");
+   
+  
+      function easeInOutQuad(t, b, c, d) {
+          t /= d/2;
+          if (t < 1) return c/2*t*t + b;
+          t--;
+          return -c/2 * (t*(t-2) - 1) + b;
+      };
+      for (let i = 0; i < 10000; i++) {
+      
+      var interval = setInterval(function() {
+      
+       easeInOutQuad(i/10000 ,1,2000,4)<=500? 	 div.style.left =   easeInOutQuad(i/10000,1,2000,4)  + "px" : null
+      		
+            },0);
+      }
+      
+      
+      
+      
+       
+   </script>
+</body>
+</html>
+ */
+
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 const titelsURLs = async (arr) => {
     return await Promise.all(arr.map(async element => {
