@@ -77,6 +77,14 @@ function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
    <script>
    
    	var div = document.getElementById("movingDiv");
+    
+    //t is the current time (framenumber) of the transition
+
+	//b is the beginning value of the property
+
+	//c is the change between the beginning and destination value of the property
+
+	//d is the total length of the transition
    
   
       function easeInOutQuad(t, b, c, d) {
@@ -87,11 +95,15 @@ function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
       };
       for (let i = 0; i < 10000; i++) {
       
-      var interval = setInterval(function() {
+      	var interval = setInterval(function() {
+      	var t = i/10000
+      	var b = 1
+  		var c = 200
+        var d = .1
       
-       easeInOutQuad(i/10000 ,1,2000,4)<=500? 	 div.style.left =   easeInOutQuad(i/10000,1,2000,4)  + "px" : null
+       easeInOutQuad(t, b, c, d) <=500? 	 div.style.left =   easeInOutQuad(t, b, c, d)   + "px" : null
       		
-            },0);
+        },1000);
       }
       
       
@@ -865,3 +877,6 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 
 // todo change the lerp function of the camera movement to a new the easy in easy out function
+
+
+//! todo rebuild the animation using window.requestAnimationFrame 
