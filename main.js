@@ -46,23 +46,60 @@ const changeCameraSnapPosition = ( arr ) => {
 
 
 
-function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
-    t = currentTime
-    b = startValue
-    c = changeInValue
-    d = duration
-    t /= d/2;
-    if (t < 1) return c/2*t*t + b;
-    t--;
-    return -c/2 * (t*(t-2) - 1) + b;
+// function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
+//     t = currentTime
+//     b = startValue
+//     c = changeInValue
+//     d = duration
+//     t /= d/2;
+//     if (t < 1) return c/2*t*t + b;
+//     t--;
+//     return -c/2 * (t*(t-2) - 1) + b;
+// };
+
+function easeInOutQuint(currentTime, startValue, changeInValue, duration) {
+    currentTime /= duration/2
+    if (currentTime < 1) return changeInValue/2*currentTime**5 + startValue;
+    currentTime -= 2
+    return changeInValue/2*(currentTime**5 + 2) + startValue
 };
 
 
-/** test more in diff env */
+const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame 
+
+var element  = document.getElementById("movingDiv")
+let start, previousTimeStamp
+let done = false
+
+function step(timestamp) {
+    if (start === undefined) {
+    start = timestamp
+    }
+    const elapsed = timestamp - start
+
+    if (previousTimeStamp !== timestamp) {
+    // Math.min() is used here to make sure the element stops at exactly 200px
+    
+    
+    const count = easeInOutQuad(elapsed, 0, 200, 2000)
+    element.style.transform = `translateX(${count}px)`
+    if (count === 200) done = true
+    }
+
+    if (elapsed < 2000) { // Stop the animation after 2 seconds
+    previousTimeStamp = timestamp
+        if (!done) {
+            window.requestAnimationFrame(step)
+        }
+    }
+}
+
+window.requestAnimationFrame(step)
+
+
+/** junk*/
 /**
- * 
- <!doctype html>
-<html>
+ <html>
 <head>
    <style>
       #movingDiv {
@@ -76,8 +113,7 @@ function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
    <div id="movingDiv"> This is my moving div! </div>
    <script>
    
-   	var div = document.getElementById("movingDiv");
-    
+       
     //t is the current time (framenumber) of the transition
 
 	//b is the beginning value of the property
@@ -87,26 +123,41 @@ function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
 	//d is the total length of the transition
    
   
-      function easeInOutQuad(t, b, c, d) {
-          t /= d/2;
-          if (t < 1) return c/2*t*t + b;
-          t--;
-          return -c/2 * (t*(t-2) - 1) + b;
+      function easeInOutQuint(t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t*t*t*t + b;
+        t -= 2;
+        return c/2*(t*t*t*t*t + 2) + b;
       };
-      for (let i = 0; i < 10000; i++) {
-      
-      	var interval = setInterval(function() {
-      	var t = i/10000
-      	var b = 1
-  		var c = 200
-        var d = .1
-      
-       easeInOutQuad(t, b, c, d) <=500? 	 div.style.left =   easeInOutQuad(t, b, c, d)   + "px" : null
-      		
-        },1000);
+   
+   	var element  = document.getElementById("movingDiv");
+   	let start, previousTimeStamp;
+    let done = false
+
+    function step(timestamp) {
+      if (start === undefined) {
+        start = timestamp;
+        }
+      const elapsed = timestamp - start;
+
+      if (previousTimeStamp !== timestamp) {
+        // Math.min() is used here to make sure the element stops at exactly 200px
+        
+        
+        const count = easeInOutQuad(elapsed, 0, 200, 2000)
+        element.style.transform = `translateX(${count}px)`;
+        if (count === 200) done = true;
       }
-      
-      
+
+      if (elapsed < 2000) { // Stop the animation after 2 seconds
+        previousTimeStamp = timestamp;
+        if (!done) {
+          window.requestAnimationFrame(step);
+        }
+      }
+    }
+
+    window.requestAnimationFrame(step);
       
       
        
@@ -880,3 +931,4 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 
 //! todo rebuild the animation using window.requestAnimationFrame 
+
