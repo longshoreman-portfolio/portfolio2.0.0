@@ -438,27 +438,12 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     var startScaleDown = false
 
 
+    // todo: remove this animation loop 
+
     function animateLoop() {
 
 
         requestAnimationFrame(animateLoop)
-    
-        /** Animate torus */
-
-    
-        /** Animate Cylinder */
-
-    
-        /** Animate cube */
-        /** Cube translation */
-    
-        /** Cube rotation */
-
-    
-        /** Animate small cube */
-
-    
-        /** Animation shpere */
 
     
         renderer.render(scene, camera)
