@@ -847,7 +847,7 @@ const mySVGRef = ref( appStorage, 'about-me.svg')
 // ! 
 
 
-global = () => { await myTitles(global) }
+global =  await myTitles(global) 
 
 
 console.log(global)
