@@ -843,7 +843,13 @@ async function func () {
 
 const mySVGRef = ref( appStorage, 'about-me.svg')
 
-global = await myTitles(global)
+
+// ! 
+
+
+global =  await myTitles(global) 
+
+
 console.log(global)
 func ()
 
@@ -916,4 +922,4 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 
 //! todo rebuild the animation using window.requestAnimationFrame 
-
+ 
