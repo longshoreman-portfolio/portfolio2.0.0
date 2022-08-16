@@ -32,7 +32,7 @@ import { async } from '@firebase/util'
 var global = {
     camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
-    cameraSnapPositions: [],
+    cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
 }
 
@@ -43,26 +43,12 @@ const changeCameraSnapPosition = ( arr ) => {
 
 
 
-
-
-
-// function easeInOutQuad(currentTime, startValue, changeInValue, duration) {
-//     t = currentTime
-//     b = startValue
-//     c = changeInValue
-//     d = duration
-//     t /= d/2;
-//     if (t < 1) return c/2*t*t + b;
-//     t--;
-//     return -c/2 * (t*(t-2) - 1) + b;
-// };
-
 function easeInOutQuint(currentTime, startValue, changeInValue, duration) {
     currentTime /= duration/2
-    if (currentTime < 1) return changeInValue/2*currentTime**5 + startValue;
+    if (currentTime < 1) return changeInValue/2*currentTime**5 + startValue
     currentTime -= 2
     return changeInValue/2*(currentTime**5 + 2) + startValue
-};
+}
 
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame 
@@ -207,6 +193,8 @@ const materilizedtitles = async (arr) => {
 }
 
 
+
+// todo: scale the middle section using the easeInOutQuad function
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
 
@@ -438,7 +426,7 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     var startScaleDown = false
 
 
-    // todo: remove this animation loop 
+    // todo: remove this animation loop and use callback
 
     function animateLoop() {
 
@@ -923,3 +911,14 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 
 //! todo rebuild the animation using window.requestAnimationFrame 
  
+
+
+
+
+// todo: loaders goes to lib 
+// todo: three js stuff goes to features
+// todo: annimation goes to features 
+// todo: fetch and load goes to services
+// todo: svg helpers and edit models goes to utils
+// todo: create 3D carousel and put it in the features
+// todo: create a carousel component and put it in the features
