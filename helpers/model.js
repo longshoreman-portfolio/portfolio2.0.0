@@ -2,6 +2,8 @@ import { getDownloadURL } from "firebase/storage";
 
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
+
+//todo: this goes to utilities
 const storageURL = ( URLs, targetEnverment ) => { 
     return  targetEnverment() === "production" ? URLs.production //production storage
         :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
@@ -21,9 +23,11 @@ const storageURL = ( URLs, targetEnverment ) => {
 
 
 
+//!----------------------------------------------------------
+//todo: abstract this to a new file for threeJs in lib folder
+//!----------------------------------------------------------
 
 // todo: to take position and scale as arguments
-
 function addModelToScene( object, scene ) {
 
     const width = window.innerWidth
@@ -41,14 +45,14 @@ function addModelToScene( object, scene ) {
     scene.add(object)
 }
 
-
+//todo: this goes to lib for three js 
 function addToScene( object, scene ) {
     scene.add(object)
 }
 
 
 
-
+//todo: this goes to services
 async function loadModel ( url ) {
     const fbxLoader = new FBXLoader()
     const result = await fbxLoader.loadAsync( url, 
@@ -66,6 +70,8 @@ async function loadModel ( url ) {
 }
 
 
+
+//todo: this goes to services
 async function fetchDownloadURL (ref) {
     return await getDownloadURL(ref)
         .then((url) => {
