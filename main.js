@@ -28,21 +28,22 @@ import { async } from '@firebase/util'
 
 
 /** global */
-
-var global = {
+//!!! impotatnt !!!
+//todo: ditch the global variable
+let global = {
     camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
     cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
 }
 
-
+//todo: remove this
 const changeCameraSnapPosition = ( arr ) => {
     global.cameraSnapPositions = [...arr]
 }
 
 
-
+//todo: abstract to utils
 function easeInOutQuint(currentTime, startValue, changeInValue, duration) {
     currentTime /= duration/2
     if (currentTime < 1) return changeInValue/2*currentTime**5 + startValue
@@ -57,6 +58,7 @@ var element  = document.getElementById("movingDiv")
 let start, previousTimeStamp
 let done = false
 
+//todo: move this to lib
 function step(timestamp) {
     if (start === undefined) {
     start = timestamp
@@ -152,6 +154,8 @@ window.requestAnimationFrame(step)
 </html>
  */
 
+
+//todo: this goes to services
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 const titelsURLs = async (arr) => {
     return await Promise.all(arr.map(async element => {
@@ -160,7 +164,7 @@ const titelsURLs = async (arr) => {
     }))
 }
 
-
+//todo: this goes to services
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
     return await Promise.all(arr.map( async element => {
@@ -169,6 +173,7 @@ const getRawTitels = async ( arr ) => {
     })) 
 }
 
+//todo: this goes to utils
 // * arra is array of raw svg from firebase storage and  names
 const devidedTitltes = async (arr) => {
     return  await Promise.all(arr.map(async element => {
@@ -177,6 +182,8 @@ const devidedTitltes = async (arr) => {
     }))
 }
 
+
+//todo: this goes to lib for three js
 // * arra is array of devided svg from firebase storage and  names
 const materilizedtitles = async (arr) => {
     return await Promise.all(arr.map( element => {
@@ -233,7 +240,8 @@ const scaleMidleSection = ( SVGTitle , n ) => {
 
 
 // from firestore 
-// ! this is a moch
+// ! this is a moch 
+//todo: this goes to json file or a js file in data folder
 const getTitelsList = async () => {
     return  [ 
         {
@@ -256,8 +264,8 @@ const getTitelsList = async () => {
 }
 
 
+//todo: this goes to features folder
 // * this to abstract the process of get  the svg from firebase storage
-
 const myTitles = async (obj) => { 
     const titles = await getTitelsList()
     const svgURLs = await titelsURLs(titles)
@@ -283,8 +291,8 @@ const gridHelper = new THREE.GridHelper( size, divisions )
 
 
 
-var cameraSnapPositions = []
-var titles = []
+let cameraSnapPositions = []
+let titles = []
 console.log( titles )
 
 
@@ -317,6 +325,7 @@ const scene = new THREE.Scene()
 
 
 
+//todo: move this to lib for three js , call back in the features folder under the name light function
 /** Lights */
 const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
 pointLightWhite.position.set(10, 10, 10)
@@ -368,6 +377,8 @@ window.addEventListener('resize', () =>{
 })
  
 
+
+//todo: move this to lib for three js or remove it in the new apprach
 /** Camera */
     //Base camera
     //Controls
@@ -382,7 +393,7 @@ window.addEventListener('resize', () =>{
 
 
 
-
+//! ???
 var params = {
     x: 0
 }
@@ -393,12 +404,16 @@ gui.add(params, 'x', -50,400).step(1).onChange(function(value){
         changeCameraX(value);
 }) 
 
+
+
+
+//todo: move this to utils folder
 function changeCameraX(value){
     camera.position.x = value
 }
 
 
-
+//todo: move this to lib
 camera.lookAt(new THREE.Vector3(0,0,0))
 
 /** Interaction with shapes */ 
@@ -596,7 +611,7 @@ const fbxLoader = new FBXLoader()
 
 const myModelRef = ref( appStorage, 'letter.fbx')
 
-// todo abstract this
+// todo abstract this to utils
 let targetEnverment = () => {
     return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
         :   process.env.NODE_ENV
@@ -611,6 +626,7 @@ let targetEnverment = () => {
 
 
 // todo: add the scene as argument to the function loadModel
+// todo: move this to lib folder
 const addObjToScene = ( url ) => {
     fbxLoader.load( url, 
         (object) => {
@@ -626,11 +642,14 @@ const addObjToScene = ( url ) => {
     )  
 }
 
-
+//todo: move this to data folder
 const myModelsInfoMoch = [
     {name: "letter"},
     {name: "HTML"},
 ]
+
+
+//todo: move this to data folder
 const mySVGsMoch = [ 
     {
         name: "my-story",
@@ -664,7 +683,8 @@ const mySVGsMoch = [
 
 
 
-
+//* this function adds the models to the scene in three diffrent ways for the different envs 
+// todo abstract it to a function in utils folder
 async () => {
     // todo abstract this to a function
     if (targetEnverment() === "emulator") {
@@ -717,7 +737,9 @@ async () => {
 
 
 
-
+//!--------------------------------------------------------------------------------------
+//todo: new approach : this should only load SVGs and  abstracted to utiltes or features
+//!--------------------------------------------------------------------------------------
 
 async function func () {
     // todo abstract this to a function
@@ -730,10 +752,14 @@ async function func () {
 
     if (targetEnverment() === "development") {
 
+
+        //!-----------------------------------------------------
+        //todo: new approach : this should only load SVGs
+        //!-----------------------------------------------------
+
         // todo: to abstract
         // todo: create a new array with objects and the name
         // * to get  from the global
-
         //global = await myTitles(global)
         let  myTitelsSVGs = global.titles
 
@@ -804,16 +830,6 @@ async function func () {
         
         global = {...global, cameraSnapPositions: [...cameraSnapPositions]}
 
-
-
-
-
-        
-        
-
-
-        /** when change */
-
        
 
 
@@ -874,7 +890,7 @@ const manageMiddleSection = ( n ) => {
 
 
 
-
+//todo: move this to lib 
 const centerCameraOnTitle = ( SVGTitle ) => {
     var firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
     var lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
