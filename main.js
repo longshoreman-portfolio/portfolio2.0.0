@@ -26,6 +26,7 @@ import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js
 import { routes } from './router'
 import { async } from '@firebase/util'
 
+import easeInOutQuad from './utilities/easeInOutQuad'
 
 /** global */
 //!!! impotatnt !!!
@@ -43,13 +44,6 @@ const changeCameraSnapPosition = ( arr ) => {
 }
 
 
-//todo: abstract to utils
-function easeInOutQuint(currentTime, startValue, changeInValue, duration) {
-    currentTime /= duration/2
-    if (currentTime < 1) return changeInValue/2*currentTime**5 + startValue
-    currentTime -= 2
-    return changeInValue/2*(currentTime**5 + 2) + startValue
-}
 
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame 
@@ -164,6 +158,7 @@ const titelsURLs = async (arr) => {
     }))
 }
 
+
 //todo: this goes to services
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
@@ -202,6 +197,7 @@ const materilizedtitles = async (arr) => {
 
 
 // todo: scale the middle section using the easeInOutQuad function
+
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
 
@@ -241,7 +237,7 @@ const scaleMidleSection = ( SVGTitle , n ) => {
 
 // from firestore 
 // ! this is a moch 
-//todo: this goes to json file or a js file in data folder
+//todo: this goes to json file or a js file in data folder for local dev env 
 const getTitelsList = async () => {
     return  [ 
         {
@@ -264,7 +260,7 @@ const getTitelsList = async () => {
 }
 
 
-//todo: this goes to features folder
+//todo: this goes to features folder under carousel folder
 // * this to abstract the process of get  the svg from firebase storage
 const myTitles = async (obj) => { 
     const titles = await getTitelsList()
