@@ -3,15 +3,6 @@ import { getDownloadURL } from "firebase/storage";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 
-//todo: this goes to utilities
-//! done
-const storageURL = ( URLs, targetEnverment ) => { 
-    return  targetEnverment() === "production" ? URLs.production //production storage
-        :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
-        :   targetEnverment() === "development" ? URLs.development //directory storage
-        :   console.error("Error: target enverment out of scope")
-}
-
 // // todo this has to become fetchModelURL
 
 

@@ -10,11 +10,13 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 import { loadSVG, materilizeSVG } from './helpers/svg-helper.js'
 
-import { storageURL, loadModel, addModelToScene } from './helpers/model'    
+import { loadModel, addModelToScene } from './helpers/model'    
 
 import fetchDownloadURL from 'service/firebase/fetch-download-url.js'
 
 import splitObject from 'utilities/split-object.js'
+
+import storageURL from 'utilities/envermentstorage-url.js'
 
 import * as dat from 'dat.gui'
 
