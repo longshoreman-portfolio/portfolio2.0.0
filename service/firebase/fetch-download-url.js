@@ -1,3 +1,5 @@
+import { getDownloadURL } from "firebase/storage"
+
 export default async function fetchDownloadURL (ref) {
     return await getDownloadURL(ref)
         .then((url) => {

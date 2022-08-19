@@ -10,8 +10,9 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 import { loadSVG, materilizeSVG, splitObject } from './helpers/svg-helper.js'
 
-import { storageURL, fetchDownloadURL, loadModel, addModelToScene } from './helpers/model'    
+import { storageURL, loadModel, addModelToScene } from './helpers/model'    
 
+import fetchDownloadURL from 'service/firebase/fetchDownloadURL'
 
 import * as dat from 'dat.gui'
 
@@ -30,7 +31,7 @@ import easeInOutQuad from './utilities/easeInOutQuad'
 
 /** global */
 //!!! impotatnt !!!
-//todo: ditch the global variable
+//todo: ditch the global letiable
 let global = {
     camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
@@ -48,7 +49,7 @@ const changeCameraSnapPosition = ( arr ) => {
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame 
 
-var element  = document.getElementById("movingDiv")
+let element  = document.getElementById("movingDiv")
 let start, previousTimeStamp
 let done = false
 
@@ -112,7 +113,7 @@ window.requestAnimationFrame(step)
         return c/2*(t*t*t*t*t + 2) + b;
       };
    
-   	var element  = document.getElementById("movingDiv");
+   	let element  = document.getElementById("movingDiv");
    	let start, previousTimeStamp;
     let done = false
 
@@ -126,7 +127,7 @@ window.requestAnimationFrame(step)
         // Math.min() is used here to make sure the element stops at exactly 200px
         
         
-        const count = easeInOutQuad(elapsed, 0, 200, 2000)
+        const count = easeInOutQuint(elapsed, 0, 200, 2000)
         element.style.transform = `translateX(${count}px)`;
         if (count === 200) done = true;
       }
@@ -201,20 +202,20 @@ const materilizedtitles = async (arr) => {
 // *
 const scaleMidleSection = ( SVGTitle , n ) => {
 
-    var middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
-    var lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
+    let middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    let lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
 
     SVGTitle.materilizedSVG[1].scale.setX(n)
     
-    var newMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    let newMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
 
 
-    var translateMiddleSectionBy  = newMiddleSectionRange.min.x - middleSectionRange.min.x
+    let translateMiddleSectionBy  = newMiddleSectionRange.min.x - middleSectionRange.min.x
     // how much to translate midel section 
     SVGTitle.materilizedSVG[1].translateX(-translateMiddleSectionBy)
-    var newestMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+    let newestMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     
-    var translateLastSectionBy = newestMiddleSectionRange.max.x - lastSectionRange.min.x
+    let translateLastSectionBy = newestMiddleSectionRange.max.x - lastSectionRange.min.x
     // how much  to translate the last part
     SVGTitle.materilizedSVG[0].translateX(translateLastSectionBy)
 }
@@ -390,11 +391,11 @@ window.addEventListener('resize', () =>{
 
 
 //! ???
-var params = {
+let params = {
     x: 0
 }
 
-var gui = new dat.GUI();
+let gui = new dat.GUI();
 
 gui.add(params, 'x', -50,400).step(1).onChange(function(value){
         changeCameraX(value);
@@ -427,123 +428,128 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
     /** Animation loop */
 
-    var i = 0
-    var j = 0
-    var k = 1
-    var x = 0
-    var y = 0
-    var executeOnce=false
-    var startScaleUp = false
-    var startScaleDown = false
+    let i = 0
+    let j = 0
+    let k = 1
+    let x = 0
+    let y = 0
+    let executeOnce=false
+    let startScaleUp = false
+    let startScaleDown = false
 
 
     // todo: remove this animation loop and use callback
 
-    function animateLoop() {
+
+    const animate = () => {
+
+    }
+
+    // function animateLoop() {
 
 
-        requestAnimationFrame(animateLoop)
+    //     requestAnimationFrame(animateLoop)
 
     
-        renderer.render(scene, camera)
-        i++
-        //console.log(j)
-        i === 400   ?   i=0 :   null
-        i === 0     ?   j++ :   null
-        //j === 4     ?   camera.position.setX( -100 ) : null
-        j === 4     ?   j=0 :   null
+    //     renderer.render(scene, camera)
+    //     i++
+    //     //console.log(j)
+    //     i === 400   ?   i=0 :   null
+    //     i === 0     ?   j++ :   null
+    //     //j === 4     ?   camera.position.setX( -100 ) : null
+    //     j === 4     ?   j=0 :   null
 
 
-        // todo abstract to function 
-        camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],camera.position.y,camera.position.z),.02)
+    //     // todo abstract to function 
+    //     camera.position.lerp(new THREE.Vector3(global.cameraSnapPositions[j],camera.position.y,camera.position.z),.02)
 
       
         
 
 
-       // console.log(camera.position)
-        // * when the animation starts : when the j changes when the i = 0
-        if( global.titles.length!==0 && i===0 ){
-            console.log('scale up') 
-            k=1
-            global.titles.forEach(element => {scaleMidleSection(element,1)})
-            startScaleUp = true
-            startScaleDown = false
-        }  
+    //    // console.log(camera.position)
+    //     // * when the animation starts : when the j changes when the i = 0
+    //     if( global.titles.length!==0 && i===0 ){
+    //         console.log('scale up') 
+    //         k=1
+    //         global.titles.forEach(element => {scaleMidleSection(element,1)})
+    //         startScaleUp = true
+    //         startScaleDown = false
+    //     }  
 
 
 
 
-        i===0 ?  executeOnce=true : null
+    //     i===0 ?  executeOnce=true : null
         
 
 
 
-        //! (i+1)/400) is not working
-        // todo scale up to 1 in linear way
+    //     //! (i+1)/400) is not working
+    //     // todo scale up to 1 in linear way
 
-        //global.titles.forEach(element => {scaleMidleSection(element, 1.001)})
+    //     //global.titles.forEach(element => {scaleMidleSection(element, 1.001)})
         
 
-        //scaleMidleSection(global.titles[0], (i+1)/400)
+    //     //scaleMidleSection(global.titles[0], (i+1)/400)
 
-        //global.titles.length!==0 ?  scaleMidleSection(global.titles[0], 1) : null
+    //     //global.titles.length!==0 ?  scaleMidleSection(global.titles[0], 1) : null
 
 
-        // * when the animation ends : when  camera.position === is a const 
-        // todo scale down to 0.01 in linear way
+    //     // * when the animation ends : when  camera.position === is a const 
+    //     // todo scale down to 0.01 in linear way
 
-        // ! here go the scale function for the middle section
-       // manageMiddleSection( j )
+    //     // ! here go the scale function for the middle section
+    //    // manageMiddleSection( j )
        
 
-        if (i % 50 === 0) { 
-            x = camera.position.x - camera.position.x % 1
-        }
+    //     if (i % 50 === 0) { 
+    //         x = camera.position.x - camera.position.x % 1
+    //     }
             
           
-        if (i % 60 === 0) { 
-            y =  camera.position.x - camera.position.x % 1
-        }
+    //     if (i % 60 === 0) { 
+    //         y =  camera.position.x - camera.position.x % 1
+    //     }
 
 
 
-        // console.log('x',x -(camera.position.x - camera.position.x % 1))
-        // console.log('y',y -(camera.position.x - camera.position.x % 1))
-        if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && executeOnce){
+    //     // console.log('x',x -(camera.position.x - camera.position.x % 1))
+    //     // console.log('y',y -(camera.position.x - camera.position.x % 1))
+    //     if(x -( camera.position.x - camera.position.x % 1)===0 && y -( camera.position.x - camera.position.x % 1 ) !== 0 && executeOnce){
            
-            console.log('scale down')
-            k=1
-            startScaleUp=false
-            startScaleDown = true
-            executeOnce=false
-        }
+    //         console.log('scale down')
+    //         k=1
+    //         startScaleUp=false
+    //         startScaleDown = true
+    //         executeOnce=false
+    //     }
 
 
 
-        if(startScaleUp) {
-            k++
-            if(k<=50){
-                global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,0.02*k)}) : null
-            }
-        }
+    //     if(startScaleUp) {
+    //         k++
+    //         if(k<=50){
+    //             global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,0.02*k)}) : null
+    //         }
+    //     }
 
-        if(startScaleDown && k<=100) {
-            k++
-            global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,/*-0.0002*k*k+1*/-0.01*k+1)}) : null
+    //     if(startScaleDown && k<=100) {
+    //         k++
+    //         global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,/*-0.0002*k*k+1*/-0.01*k+1)}) : null
             
-            // if(k>=50) {
-            //     global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,1/14900*(k*(1-k)+9900))}) : null
-            // }
+    //         // if(k>=50) {
+    //         //     global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,1/14900*(k*(1-k)+9900))}) : null
+    //         // }
             
-        }
+    //     }
 
 
 
          
-            // console.log('x',x )
-            // console.log('y',y )
-            // console.log('camera',camera.position.x)
+    //         // console.log('x',x )
+    //         // console.log('y',y )
+    //         // console.log('camera',camera.position.x)
     
         
         
@@ -554,21 +560,19 @@ camera.lookAt(new THREE.Vector3(0,0,0))
         
             
 
-        // todo make illusion of infinty loop (how to do it when the new obj can be seen whit odl one)
-        // * idea what if i teleport the first object to after the last one and then teleport it back with the camera to the beginning
-        // * when we are at j 3 we teleport the obj0 to postion 4 
-        // * when we are at j 4 we teleport the obj0  and the camera to postion 0 
+    //     // todo make illusion of infinty loop (how to do it when the new obj can be seen whit odl one)
+    //     // * idea what if i teleport the first object to after the last one and then teleport it back with the camera to the beginning
+    //     // * when we are at j 3 we teleport the obj0 to postion 4 
+    //     // * when we are at j 4 we teleport the obj0  and the camera to postion 0 
 
         
         
-        // lerpScaleMidleSection(titles[j],(i+1)/400)
+    //     // lerpScaleMidleSection(titles[j],(i+1)/400)
 
-        // todo call the midel scale down  function 
-        // todo change color
-        // todo add movement  to models around the title 
-        // todo 
-
-
+    //     // todo call the midel scale down  function 
+    //     // todo change color
+    //     // todo add movement  to models around the title 
+    //     // todo 
 
 
 
@@ -577,8 +581,10 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
 
 
-    }
-    animateLoop()
+
+
+    // }
+    // animateLoop()
 
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
@@ -781,8 +787,8 @@ async function func () {
 
 
         /** init */
-        var proprtion = {n: .01}
-        var arr = myTitelsSVGs[0]
+        let proprtion = {n: .01}
+        let arr = myTitelsSVGs[0]
         titles = [...myTitelsSVGs]
         const changeProprtion = (value) => {
             {n: value}
@@ -801,24 +807,24 @@ async function func () {
         
 
         //  translate the midle section and the last section
-        // var box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
-        // var box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+        // let box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
+        // let box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
         // arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
         // arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
 
 
 
         //center camera on the model
-        var box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
-        var box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+        let box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+        let box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
         camera.position.setX(  (box2.max.x+box1.min.x)/2)
 
 
         // camera snap positions
         cameraSnapPositions = myTitelsSVGs.map(
             (element) => {  
-                var box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
-                var box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
+                let box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
+                let box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
                 return  (box2.max.x+box1.min.x)/2
             }
         )
@@ -888,8 +894,8 @@ const manageMiddleSection = ( n ) => {
 
 //todo: move this to lib 
 const centerCameraOnTitle = ( SVGTitle ) => {
-    var firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
-    var lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+    let firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+    let lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
     camera.position.setX(  (firstSectionRange.max.x + lastSectionRange.min.x)/2)
 }
 
