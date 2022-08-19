@@ -8,15 +8,17 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
-import { materilizeSVG } from './helpers/svg-helper.js'
+
 
 import { addModelToScene } from './helpers/model'    
 
 import fetchDownloadURL from 'service/firebase/fetch-download-url.js'
 
-import splitObject from 'utilities/split-object.js'
+import splitObject from './utilities/split-object.js'
 
-import storageURL from 'utilities/envermentstorage-url.js'
+import storageURL from './utilities/envermentstorage-url.js'
+
+import materilizeSVG from './lib/three-js/materilize-SVG.js'
 
 import * as dat from 'dat.gui'
 
