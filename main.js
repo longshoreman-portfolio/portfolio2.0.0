@@ -8,11 +8,13 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
-import { loadSVG, materilizeSVG, splitObject } from './helpers/svg-helper.js'
+import { loadSVG, materilizeSVG } from './helpers/svg-helper.js'
 
 import { storageURL, loadModel, addModelToScene } from './helpers/model'    
 
-import fetchDownloadURL from 'service/firebase/fetchDownloadURL'
+import fetchDownloadURL from 'service/firebase/fetch-download-url.js'
+
+import splitObject from 'utilities/split-object.js'
 
 import * as dat from 'dat.gui'
 
