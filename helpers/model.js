@@ -42,25 +42,6 @@ function addToScene( object, scene ) {
 
 
 
-//todo: this goes to services
-//! done
-async function loadModel ( url ) {
-    const fbxLoader = new FBXLoader()
-    const result = await fbxLoader.loadAsync( url, 
-        (object) => {
-            return object
-        },
-        (xhr) => {
-            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-        },
-        (error) => {
-            console.log('error:', error)
-        }
-    )  
-    return result
-}
-
-
 
 
 // todo: find relations between three js scale and window.innerWidth and window.innerHeight
@@ -69,4 +50,4 @@ async function loadModel ( url ) {
 
 
 
-export { storageURL, loadModel, addModelToScene, addToScene }
+export { storageURL, addModelToScene, addToScene }

@@ -8,9 +8,9 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
-import { loadSVG, materilizeSVG } from './helpers/svg-helper.js'
+import { materilizeSVG } from './helpers/svg-helper.js'
 
-import { loadModel, addModelToScene } from './helpers/model'    
+import { addModelToScene } from './helpers/model'    
 
 import fetchDownloadURL from 'service/firebase/fetch-download-url.js'
 
@@ -32,6 +32,7 @@ import { routes } from './router'
 import { async } from '@firebase/util'
 
 import easeInOutQuad from './utilities/easeInOutQuad'
+import loadAsset from './utilities/load-asset'
 
 /** global */
 //!!! impotatnt !!!
@@ -168,7 +169,7 @@ const titelsURLs = async (arr) => {
 // * arr is arr of urls  and names
 const getRawTitels = async ( arr ) => {
     return await Promise.all(arr.map( async element => {
-        const rawSVG = await loadSVG(element.svgLink)
+        const rawSVG = await loadAsset(element.svgLink, SVGLoader)
         return { name: element.name, rawSVG: rawSVG }
     })) 
 }
@@ -696,7 +697,7 @@ async () => {
     if (targetEnverment() === "emulator") {
         connectStorageEmulator( myStorage, "localhost", 9199)
         const modelURL = await fetchDownloadURL(myModelRef)
-        const model = await loadModel(modelURL)
+        const model = await loadAsset(modelURL,FBXLoader) 
         addModelToScene(model,scene)
         // todo devide this funciton to two functions
 
@@ -704,14 +705,14 @@ async () => {
 
     if (targetEnverment() === "development") {
         const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
-        addModelToScene(  await loadModel(url) ,scene )
+        addModelToScene(  await loadAsset(url,FBXLoader) ,scene )
     }
 
 
 
     if ( targetEnverment() === "production" ) {
         const modelURL = await fetchDownloadURL(myModelRef)
-        const model = await loadModel(modelURL)
+        const model = await loadAsset(modelURL, FBXLoader)
         addModelToScene(model,scene)
     }
 }
@@ -752,7 +753,7 @@ async function func () {
     if (targetEnverment() === "emulator") {
         connectStorageEmulator( appStorage, "localhost", 9199)
         //const SVGURL = await fetchDownloadURL(mySVGRef)
-        //loadSVG(SVGURL)
+        //loadAsset(SVGURL, SVGloader)
         
     }
 
@@ -774,7 +775,7 @@ async function func () {
         //     const SVGURL = await storageURL( routes, targetEnverment ) + element.link
 
 
-        //     const rawSVG = await loadSVG(SVGURL)
+        //     const rawSVG = await loadAsset(SVGURL, SVGloader)
 
         //     const devidedSVG = splitObject(rawSVG)
 
@@ -846,7 +847,7 @@ async function func () {
     if ( targetEnverment() === "production" ) {
 
         const SVGURL = await fetchDownloadURL(mySVGRef)
-        //loadSVG(SVGURL)
+        //loadAsset(SVGURL,SVGloader)
     }
 }
 
