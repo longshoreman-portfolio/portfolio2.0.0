@@ -1,5 +1,6 @@
 export default async function loadAsset( url, loader ) { 
-    const result = await loader.loadAsync(
+    let thisLoader = new loader
+    const result = await thisLoader.loadAsync(
         url,
         ( data ) => {
             return data
