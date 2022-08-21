@@ -12,11 +12,11 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 import { addModelToScene } from './helpers/model'    
 
-import fetchDownloadURL from 'service/firebase/fetch-download-url.js'
+import fetchDownloadURL from './service/firebase/fetch-download-url.js'
 
 import splitObject from './utilities/split-object.js'
 
-import storageURL from './utilities/envermentstorage-url.js'
+import envermentStorage from './utilities/enverment-storage-url.js'
 
 import materilizeSVG from './lib/three-js/materilize-SVG.js'
 
@@ -31,14 +31,19 @@ import { app , appStorage }  from './firebase-config.js'
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
 import { routes } from './router'
+
 import { async } from '@firebase/util'
 
-import easeInOutQuad from './utilities/easeInOutQuad'
-import loadAsset from './utilities/load-asset'
+import easeInOutQuad from './utilities/animation/ease-in-out-quint.js'
+
+import loadAsset from './utilities/load-asset.js'
 
 /** global */
 //!!! impotatnt !!!
-//todo: ditch the global letiable
+//todo: ditch the global letiable maybe use clouser ! 
+
+
+
 let global = {
     camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
@@ -60,31 +65,6 @@ let element  = document.getElementById("movingDiv")
 let start, previousTimeStamp
 let done = false
 
-//todo: move this to lib
-function step(timestamp) {
-    if (start === undefined) {
-    start = timestamp
-    }
-    const elapsed = timestamp - start
-
-    if (previousTimeStamp !== timestamp) {
-    // Math.min() is used here to make sure the element stops at exactly 200px
-    
-    
-    const count = easeInOutQuad(elapsed, 0, 200, 2000)
-    element.style.transform = `translateX(${count}px)`
-    if (count === 200) done = true
-    }
-
-    if (elapsed < 2000) { // Stop the animation after 2 seconds
-    previousTimeStamp = timestamp
-        if (!done) {
-            window.requestAnimationFrame(step)
-        }
-    }
-}
-
-window.requestAnimationFrame(step)
 
 
 /** junk*/
@@ -161,11 +141,10 @@ window.requestAnimationFrame(step)
 // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 const titelsURLs = async (arr) => {
     return await Promise.all(arr.map(async element => {
-        const SVGURL=  await storageURL( routes, targetEnverment ) + element.link
+        const SVGURL=  await envermentStorage( routes, targetEnverment ) + element.link
         return { name: element.name, svgLink: SVGURL }
     }))
 }
-
 
 //todo: this goes to services
 // * arr is arr of urls  and names
@@ -706,7 +685,7 @@ async () => {
     }
 
     if (targetEnverment() === "development") {
-        const url = storageURL( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+        const url = envermentStorage( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
         addModelToScene(  await loadAsset(url,FBXLoader) ,scene )
     }
 
@@ -774,7 +753,7 @@ async function func () {
 
         // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
-        //     const SVGURL = await storageURL( routes, targetEnverment ) + element.link
+        //     const SVGURL = await envermentStorage( routes, targetEnverment ) + element.link
 
 
         //     const rawSVG = await loadAsset(SVGURL, SVGloader)
@@ -947,3 +926,7 @@ global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(
 // todo: svg helpers and edit models goes to utils
 // todo: create 3D carousel and put it in the features
 // todo: create a carousel component and put it in the features
+
+
+
+

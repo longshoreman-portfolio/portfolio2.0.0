@@ -50,4 +50,4 @@ function addToScene( object, scene ) {
 
 
 
-export { storageURL, addModelToScene, addToScene }
+export { addModelToScene, addToScene }
