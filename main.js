@@ -43,6 +43,7 @@ import loadAsset from './utilities/load-asset.js'
 //todo: ditch the global letiable maybe use clouser ! 
 
 
+const scene = new THREE.Scene()
 
 let global = {
     camera: {position: new THREE.Vector3(0,15,60)},
@@ -64,6 +65,70 @@ const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestA
 let element  = document.getElementById("movingDiv")
 let start, previousTimeStamp
 let done = false
+
+
+let createBox = () => {
+    const geometry = new THREE.BoxGeometry( 10, 10, 10 )
+    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } )
+    const mesh = new THREE.Mesh( geometry, material )
+    return mesh
+}
+
+let meshes = []
+let scroll = 0
+let scrollTarget = 0
+let currentScroll = 0
+
+
+let updateStuffPositions = () => {
+    meshes.forEach(obj=>{
+        obj.mesh.position.x = 15.1*obj.index
+    })
+}
+
+let createMeshesArr = () => {
+    for(let i = 0; i < 10; i++ ) {
+        let mesh = createBox()
+        meshes.push({
+            mesh,
+            index: i
+        })
+        scene.add(mesh)
+    }
+}
+
+let scrollEvent = () => {
+    document.addEventListener("scroll", (event)=>{
+        scrollTarget = window.scrollY*10
+    })
+
+    
+}
+
+createMeshesArr()
+updateStuffPositions()
+
+let addStuffToScene = () => {
+
+}
+
+
+
+
+
+
+
+let stop = () => {
+
+}
+
+let play = () => {
+
+}
+
+let setupResize = () => {
+
+}
 
 
 
@@ -288,7 +353,6 @@ const renderer = new THREE.WebGLRenderer({
 })
 
 /** Scene */
-const scene = new THREE.Scene()
 
 
 
@@ -572,10 +636,14 @@ camera.lookAt(new THREE.Vector3(0,0,0))
     // }
     // animateLoop()
 
+    
 /** Background */
 // TODO: Add a function to change the background color with the scroll. 
 scene.background = new THREE.Color( 0x808080 )
 
+
+
+renderer.render(scene, camera)
 
 // TODO add centred nav bar 
 // TODO add about drop down full screen 
