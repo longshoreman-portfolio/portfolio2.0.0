@@ -44,6 +44,7 @@ import loadAsset from './utilities/load-asset.js'
 
 
 const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
 
 let global = {
     camera: {position: new THREE.Vector3(0,15,60)},
@@ -51,6 +52,12 @@ let global = {
     cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
 }
+
+/** Canvas */
+const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector('#bg'),
+    antialias: true
+})
 
 //todo: remove this
 const changeCameraSnapPosition = ( arr ) => {
@@ -67,27 +74,37 @@ let start, previousTimeStamp
 let done = false
 
 
-let createBox = () => {
-    const geometry = new THREE.BoxGeometry( 10, 10, 10 )
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } )
-    const mesh = new THREE.Mesh( geometry, material )
-    return mesh
-}
+// ! **********************************************************************
+
+
+
 
 let meshes = []
 let scroll = 0
 let scrollTarget = 0
 let currentScroll = 0
+let number = 10
+let boxSize = 10
+
+let createBox = () => {
+    const geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
+    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } )
+    const mesh = new THREE.Mesh( geometry, material )
+    return mesh
+}
 
 
-let updateStuffPositions = () => {
+let updateStuff = () => {
+    const margin = 20
+    const wholeWidth = number*margin
     meshes.forEach(obj=>{
-        obj.mesh.position.x = 15.1*obj.index
+        obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
+        
     })
 }
 
 let createMeshesArr = () => {
-    for(let i = 0; i < 10; i++ ) {
+    for(let i = 0; i < number; i++ ) {
         let mesh = createBox()
         meshes.push({
             mesh,
@@ -98,25 +115,32 @@ let createMeshesArr = () => {
 }
 
 let scrollEvent = () => {
-    document.addEventListener("scroll", (event)=>{
-        scrollTarget = window.scrollY*10
+    document.addEventListener("mousewheel", (event)=>{
+        scrollTarget = event.wheelDelta*0.3
+
+
+        currentScroll += scroll
+        //console.log(currentScroll)
+
+        updateStuff()
+        renderer.render(scene, camera)
+
     })
+
 
     
 }
 
 createMeshesArr()
-updateStuffPositions()
+updateStuff()
+scrollEvent()
+
+
+
 
 let addStuffToScene = () => {
 
 }
-
-
-
-
-
-
 
 let stop = () => {
 
@@ -130,6 +154,25 @@ let setupResize = () => {
 
 }
 
+
+    function animation() {
+
+        scroll += (scrollTarget - scroll)*0.1
+        scroll += (scrollTarget - scroll)*0.1
+        scroll *= 0.9
+        scrollTarget *= 0.9
+        currentScroll += scroll*0.01
+
+        requestAnimationFrame(animation)
+        renderer.render(scene, camera)
+
+    }
+
+    animation()
+
+
+
+// ! **********************************************************************
 
 
 /** junk*/
@@ -202,74 +245,74 @@ let setupResize = () => {
  */
 
 
-//todo: this goes to services
-// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
-const titelsURLs = async (arr) => {
-    return await Promise.all(arr.map(async element => {
-        const SVGURL=  await envermentStorage( routes, targetEnverment ) + element.link
-        return { name: element.name, svgLink: SVGURL }
-    }))
-}
+// //todo: this goes to services
+// // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
+// const titelsURLs = async (arr) => {
+//     return await Promise.all(arr.map(async element => {
+//         const SVGURL=  await envermentStorage( routes, targetEnverment ) + element.link
+//         return { name: element.name, svgLink: SVGURL }
+//     }))
+// }
 
-//todo: this goes to services
-// * arr is arr of urls  and names
-const getRawTitels = async ( arr ) => {
-    return await Promise.all(arr.map( async element => {
-        const rawSVG = await loadAsset(element.svgLink, SVGLoader)
-        return { name: element.name, rawSVG: rawSVG }
-    })) 
-}
+// //todo: this goes to services
+// // * arr is arr of urls  and names
+// const getRawTitels = async ( arr ) => {
+//     return await Promise.all(arr.map( async element => {
+//         const rawSVG = await loadAsset(element.svgLink, SVGLoader)
+//         return { name: element.name, rawSVG: rawSVG }
+//     })) 
+// }
 
-//todo: this goes to utils
-// * arra is array of raw svg from firebase storage and  names
-const devidedTitltes = async (arr) => {
-    return  await Promise.all(arr.map(async element => {
-        const devidedSVG = splitObject(element.rawSVG)
-        return { name: element.name, devidedSVG: devidedSVG }
-    }))
-}
+// //todo: this goes to utils
+// // * arra is array of raw svg from firebase storage and  names
+// const devidedTitltes = async (arr) => {
+//     return  await Promise.all(arr.map(async element => {
+//         const devidedSVG = splitObject(element.rawSVG)
+//         return { name: element.name, devidedSVG: devidedSVG }
+//     }))
+// }
 
 
 //todo: this goes to lib for three js
 // * arra is array of devided svg from firebase storage and  names
-const materilizedtitles = async (arr) => {
-    return await Promise.all(arr.map( element => {
-        return {
-            name: element.name, 
-            svg: [ ...element.devidedSVG ], 
-            materilizedSVG: [
-                materilizeSVG(element.devidedSVG[0]),
-                materilizeSVG(element.devidedSVG[1]),
-                materilizeSVG(element.devidedSVG[2])
-            ]
-        }
-    }))
-}
+// const materilizedtitles = async (arr) => {
+//     return await Promise.all(arr.map( element => {
+//         return {
+//             name: element.name, 
+//             svg: [ ...element.devidedSVG ], 
+//             materilizedSVG: [
+//                 materilizeSVG(element.devidedSVG[0]),
+//                 materilizeSVG(element.devidedSVG[1]),
+//                 materilizeSVG(element.devidedSVG[2])
+//             ]
+//         }
+//     }))
+// }
 
 
 
 // todo: scale the middle section using the easeInOutQuad function
 
-// *
-const scaleMidleSection = ( SVGTitle , n ) => {
+// // *
+// const scaleMidleSection = ( SVGTitle , n ) => {
 
-    let middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
-    let lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
+//     let middleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+//     let lastSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[0] )
 
-    SVGTitle.materilizedSVG[1].scale.setX(n)
+//     SVGTitle.materilizedSVG[1].scale.setX(n)
     
-    let newMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+//     let newMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
 
 
-    let translateMiddleSectionBy  = newMiddleSectionRange.min.x - middleSectionRange.min.x
-    // how much to translate midel section 
-    SVGTitle.materilizedSVG[1].translateX(-translateMiddleSectionBy)
-    let newestMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
+//     let translateMiddleSectionBy  = newMiddleSectionRange.min.x - middleSectionRange.min.x
+//     // how much to translate midel section 
+//     SVGTitle.materilizedSVG[1].translateX(-translateMiddleSectionBy)
+//     let newestMiddleSectionRange = new THREE.Box3().setFromObject( SVGTitle.materilizedSVG[1] )
     
-    let translateLastSectionBy = newestMiddleSectionRange.max.x - lastSectionRange.min.x
-    // how much  to translate the last part
-    SVGTitle.materilizedSVG[0].translateX(translateLastSectionBy)
-}
+//     let translateLastSectionBy = newestMiddleSectionRange.max.x - lastSectionRange.min.x
+//     // how much  to translate the last part
+//     SVGTitle.materilizedSVG[0].translateX(translateLastSectionBy)
+// }
 
 
 
@@ -287,45 +330,45 @@ const scaleMidleSection = ( SVGTitle , n ) => {
 
 
 
-// from firestore 
-// ! this is a moch 
-//todo: this goes to json file or a js file in data folder for local dev env 
-const getTitelsList = async () => {
-    return  [ 
-        {
-            name: "my-story",
-            link: "svg/my-story.svg"
-        },
-        {
-            name: "my-work",
-            link: "svg/my-work.svg"
-        },
-        {
-            name: "reach-out",
-            link: "svg/reach-out.svg"
-        },
-        {
-            name: "buy-me-a-coffee",
-            link: "svg/buy-me-a-coffee.svg"
-        },
-    ]
-}
+// // from firestore 
+// // ! this is a moch 
+// //todo: this goes to json file or a js file in data folder for local dev env 
+// const getTitelsList = async () => {
+//     return  [ 
+//         {
+//             name: "my-story",
+//             link: "svg/my-story.svg"
+//         },
+//         {
+//             name: "my-work",
+//             link: "svg/my-work.svg"
+//         },
+//         {
+//             name: "reach-out",
+//             link: "svg/reach-out.svg"
+//         },
+//         {
+//             name: "buy-me-a-coffee",
+//             link: "svg/buy-me-a-coffee.svg"
+//         },
+//     ]
+// }
 
 
 //todo: this goes to features folder under carousel folder
 // * this to abstract the process of get  the svg from firebase storage
-const myTitles = async (obj) => { 
-    const titles = await getTitelsList()
-    const svgURLs = await titelsURLs(titles)
-    const rawTitles = await getRawTitels(svgURLs)
-    const devidedTitles = await devidedTitltes(rawTitles)
-    const materilizedTitles = await materilizedtitles(devidedTitles)
+// const myTitles = async (obj) => { 
+//     const titles = await getTitelsList()
+//     const svgURLs = await titelsURLs(titles)
+//     const rawTitles = await getRawTitels(svgURLs)
+//     const devidedTitles = await devidedTitltes(rawTitles)
+//     const materilizedTitles = await materilizedtitles(devidedTitles)
 
-    return {
-        ...obj,
-        titles:materilizedTitles
-    }
-}
+//     return {
+//         ...obj,
+//         titles:materilizedTitles
+//     }
+// }
 
  
 
@@ -339,18 +382,14 @@ const gridHelper = new THREE.GridHelper( size, divisions )
 
 
 
-let cameraSnapPositions = []
-let titles = []
-console.log( titles )
+// let cameraSnapPositions = []
+// let titles = []
+// console.log( titles )
 
 
 
 
-/** Canvas */
-const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#bg'),
-    antialias: true
-})
+
 
 /** Scene */
 
@@ -372,22 +411,22 @@ const renderer = new THREE.WebGLRenderer({
 
 
 
-//todo: move this to lib for three js , call back in the features folder under the name light function
-/** Lights */
-const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
-pointLightWhite.position.set(10, 10, 10)
+// //todo: move this to lib for three js , call back in the features folder under the name light function
+// /** Lights */
+// const pointLightWhite = new THREE.PointLight(0xffffff ,1, 100 )
+// pointLightWhite.position.set(10, 10, 10)
 
-const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 100 )
-pointLightGreen.position.set(20, -9, 0)
+// const pointLightGreen = new THREE.PointLight(0x00e68a, 1, 100 )
+// pointLightGreen.position.set(20, -9, 0)
 
-const pointLightOrange = new THREE.PointLight(0xff5c33, 1, 100 )
-pointLightOrange.position.set(-4, -10, -20)
+// const pointLightOrange = new THREE.PointLight(0xff5c33, 1, 100 )
+// pointLightOrange.position.set(-4, -10, -20)
 
-const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
-pointLightPurple.position.set(30, 10, -20)
+// const pointLightPurple = new THREE.PointLight(0xcc33ff, 1, 100 )
+// pointLightPurple.position.set(30, 10, -20)
 
-const ambientLight = new THREE.AmbientLight(0xffffff)
-scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
+// const ambientLight = new THREE.AmbientLight(0xffffff)
+// scene.add(ambientLight , pointLightWhite, pointLightGreen, pointLightPurple, pointLightOrange)
 
 
 scene.add( gridHelper )
@@ -407,29 +446,29 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>{
+// window.addEventListener('resize', () =>{
 
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+//     // Update sizes
+//     sizes.width = window.innerWidth
+//     sizes.height = window.innerHeight
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+//     // Update camera
+//     camera.aspect = sizes.width / sizes.height
+//     camera.updateProjectionMatrix()
 
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+//     // Update renderer
+//     renderer.setSize(sizes.width, sizes.height)
+//     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-})
+// })
  
 
 
-//todo: move this to lib for three js or remove it in the new apprach
+// //todo: move this to lib for three js or remove it in the new apprach
 /** Camera */
     //Base camera
     //Controls
-    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
+    
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
     camera.position.setZ(global.camera.position.z)
@@ -440,24 +479,24 @@ window.addEventListener('resize', () =>{
 
 
 
-//! ???
-let params = {
-    x: 0
-}
+// //! ???
+// let params = {
+//     x: 0
+// }
 
-let gui = new dat.GUI();
+// let gui = new dat.GUI();
 
-gui.add(params, 'x', -50,400).step(1).onChange(function(value){
-        changeCameraX(value);
-}) 
-
-
+// gui.add(params, 'x', -50,400).step(1).onChange(function(value){
+//         changeCameraX(value);
+// }) 
 
 
-//todo: move this to utils folder
-function changeCameraX(value){
-    camera.position.x = value
-}
+
+
+// //todo: move this to utils folder
+// function changeCameraX(value){
+//     camera.position.x = value
+// }
 
 
 //todo: move this to lib
@@ -478,22 +517,22 @@ camera.lookAt(new THREE.Vector3(0,0,0))
 
     /** Animation loop */
 
-    let i = 0
-    let j = 0
-    let k = 1
-    let x = 0
-    let y = 0
-    let executeOnce=false
-    let startScaleUp = false
-    let startScaleDown = false
+    // let i = 0
+    // let j = 0
+    // let k = 1
+    // let x = 0
+    // let y = 0
+    // let executeOnce=false
+    // let startScaleUp = false
+    // let startScaleDown = false
 
 
-    // todo: remove this animation loop and use callback
+    // // todo: remove this animation loop and use callback
 
 
-    const animate = () => {
+    // const animate = () => {
 
-    }
+    // }
 
     // function animateLoop() {
 
@@ -663,15 +702,15 @@ renderer.render(scene, camera)
 
 
 
-const fbxLoader = new FBXLoader()
+// const fbxLoader = new FBXLoader()
 
-const myModelRef = ref( appStorage, 'letter.fbx')
+// const myModelRef = ref( appStorage, 'letter.fbx')
 
-// todo abstract this to utils
-let targetEnverment = () => {
-    return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
-        :   process.env.NODE_ENV
-}
+// // todo abstract this to utils
+// let targetEnverment = () => {
+//     return  (process.env.NODE_ENV === "production" && location.hostname === "localhost") ? "emulator"
+//         :   process.env.NODE_ENV
+// }
 
 
 
@@ -681,49 +720,49 @@ let targetEnverment = () => {
 // // TODO remove this finction 
 
 
-// todo: add the scene as argument to the function loadModel
-// todo: move this to lib folder
-const addObjToScene = ( url ) => {
-    fbxLoader.load( url, 
-        (object) => {
-            object.scale.set(.1, .1, .1)
-            scene.add(object)
-        },
-        (xhr) => {
-            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-        },
-        (error) => {
-            console.log('error:', error)
-        }
-    )  
-}
+// // todo: add the scene as argument to the function loadModel
+// // todo: move this to lib folder
+// const addObjToScene = ( url ) => {
+//     fbxLoader.load( url, 
+//         (object) => {
+//             object.scale.set(.1, .1, .1)
+//             scene.add(object)
+//         },
+//         (xhr) => {
+//             console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+//         },
+//         (error) => {
+//             console.log('error:', error)
+//         }
+//     )  
+// }
 
-//todo: move this to data folder
-const myModelsInfoMoch = [
-    {name: "letter"},
-    {name: "HTML"},
-]
+// //todo: move this to data folder
+// const myModelsInfoMoch = [
+//     {name: "letter"},
+//     {name: "HTML"},
+// ]
 
 
-//todo: move this to data folder
-const mySVGsMoch = [ 
-    {
-        name: "my-story",
-        link: "svg/my-story.svg"
-    },
-    {
-        name: "my-work",
-        link: "svg/my-work.svg"
-    },
-    {
-        name: "reach-out",
-        link: "svg/reach-out.svg"
-    },
-    {
-        name: "buy-me-a-coffee",
-        link: "svg/buy-me-a-coffee.svg"
-    },
-]
+// //todo: move this to data folder
+// const mySVGsMoch = [ 
+//     {
+//         name: "my-story",
+//         link: "svg/my-story.svg"
+//     },
+//     {
+//         name: "my-work",
+//         link: "svg/my-work.svg"
+//     },
+//     {
+//         name: "reach-out",
+//         link: "svg/reach-out.svg"
+//     },
+//     {
+//         name: "buy-me-a-coffee",
+//         link: "svg/buy-me-a-coffee.svg"
+//     },
+// ]
 
 
 
@@ -740,261 +779,260 @@ const mySVGsMoch = [
 
 
 //* this function adds the models to the scene in three diffrent ways for the different envs 
-// todo abstract it to a function in utils folder
-async () => {
-    // todo abstract this to a function
-    if (targetEnverment() === "emulator") {
-        connectStorageEmulator( myStorage, "localhost", 9199)
-        const modelURL = await fetchDownloadURL(myModelRef)
-        const model = await loadAsset(modelURL,FBXLoader) 
-        addModelToScene(model,scene)
-        // todo devide this funciton to two functions
+// // todo abstract it to a function in utils folder
+// async () => {
+//     // todo abstract this to a function
+//     if (targetEnverment() === "emulator") {
+//         connectStorageEmulator( myStorage, "localhost", 9199)
+//         const modelURL = await fetchDownloadURL(myModelRef)
+//         const model = await loadAsset(modelURL,FBXLoader) 
+//         addModelToScene(model,scene)
+//         // todo devide this funciton to two functions
 
-    }
+//     }
 
-    if (targetEnverment() === "development") {
-        const url = envermentStorage( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
-        addModelToScene(  await loadAsset(url,FBXLoader) ,scene )
-    }
-
-
-
-    if ( targetEnverment() === "production" ) {
-        const modelURL = await fetchDownloadURL(myModelRef)
-        const model = await loadAsset(modelURL, FBXLoader)
-        addModelToScene(model,scene)
-    }
-}
+//     if (targetEnverment() === "development") {
+//         const url = envermentStorage( routes, targetEnverment ) +  myModelsInfoMoch[1].name + ".fbx"
+//         addModelToScene(  await loadAsset(url,FBXLoader) ,scene )
+//     }
 
 
 
-
-// todo: emulator firestore
-// todo: create a fucntion that fetch all the colloections of the models from firestore
-// todo: create a function that takes as argument collection name and returns the array of models names
-// todo: create a function that takes as argument an array of models names and retuens an array of objcts with the mode name and the url of the model in the farebase storage
-// todo: create a function that takes as argument an array of objects and a postion function render all the models in the scene 
-// todo: craete a function that returns a random position
-// todo: ditch the random position and use only three or four models that turns => so create a function that retern positions 
-
-
-
-// // todo: function to loadobject 
-// // todo: function to add object to the scene
-// // todo: function for the positon 
-// // todo: function to scale models
+//     if ( targetEnverment() === "production" ) {
+//         const modelURL = await fetchDownloadURL(myModelRef)
+//         const model = await loadAsset(modelURL, FBXLoader)
+//         addModelToScene(model,scene)
+//     }
+// }
 
 
 
 
-// // todo: create a function that takes as argumnet model ref and retuns download url
+// // todo: emulator firestore
+// // todo: create a fucntion that fetch all the colloections of the models from firestore
+// // todo: create a function that takes as argument collection name and returns the array of models names
+// // todo: create a function that takes as argument an array of models names and retuens an array of objcts with the mode name and the url of the model in the farebase storage
+// // todo: create a function that takes as argument an array of objects and a postion function render all the models in the scene 
+// // todo: craete a function that returns a random position
+// // todo: ditch the random position and use only three or four models that turns => so create a function that retern positions 
+
+
+
+// // // todo: function to loadobject 
+// // // todo: function to add object to the scene
+// // // todo: function for the positon 
+// // // todo: function to scale models
+
+
+
+
+// // // todo: create a function that takes as argumnet model ref and retuns download url
 
 
 
 
 
-//!--------------------------------------------------------------------------------------
-//todo: new approach : this should only load SVGs and  abstracted to utiltes or features
-//!--------------------------------------------------------------------------------------
+// //!--------------------------------------------------------------------------------------
+// //todo: new approach : this should only load SVGs and  abstracted to utiltes or features
+// //!--------------------------------------------------------------------------------------
 
-async function func () {
-    // todo abstract this to a function
-    if (targetEnverment() === "emulator") {
-        connectStorageEmulator( appStorage, "localhost", 9199)
-        //const SVGURL = await fetchDownloadURL(mySVGRef)
-        //loadAsset(SVGURL, SVGloader)
+// async function func () {
+//     // todo abstract this to a function
+//     if (targetEnverment() === "emulator") {
+//         connectStorageEmulator( appStorage, "localhost", 9199)
+//         //const SVGURL = await fetchDownloadURL(mySVGRef)
+//         //loadAsset(SVGURL, SVGloader)
         
-    }
+//     }
 
-    if (targetEnverment() === "development") {
+//     if (targetEnverment() === "development") {
 
 
-        //!-----------------------------------------------------
-        //todo: new approach : this should only load SVGs
-        //!-----------------------------------------------------
+//         //!-----------------------------------------------------
+//         //todo: new approach : this should only load SVGs
+//         //!-----------------------------------------------------
 
-        // todo: to abstract
-        // todo: create a new array with objects and the name
-        // * to get  from the global
-        //global = await myTitles(global)
-        let  myTitelsSVGs = global.titles
+//         // todo: to abstract
+//         // todo: create a new array with objects and the name
+//         // * to get  from the global
+//         //global = await myTitles(global)
+//         let  myTitelsSVGs = global.titles
 
-        // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
+//         // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
-        //     const SVGURL = await envermentStorage( routes, targetEnverment ) + element.link
+//         //     const SVGURL = await envermentStorage( routes, targetEnverment ) + element.link
 
 
-        //     const rawSVG = await loadAsset(SVGURL, SVGloader)
+//         //     const rawSVG = await loadAsset(SVGURL, SVGloader)
 
-        //     const devidedSVG = splitObject(rawSVG)
+//         //     const devidedSVG = splitObject(rawSVG)
 
-        //     return {
-        //         name: element.name, 
-        //         svg: [ ...devidedSVG ], 
-        //         materilizedSVG: [
-        //             materilizeSVG(devidedSVG[0]),
-        //             materilizeSVG(devidedSVG[1]),
-        //             materilizeSVG(devidedSVG[2])
-        //         ]
-        //     }
-        // }))
+//         //     return {
+//         //         name: element.name, 
+//         //         svg: [ ...devidedSVG ], 
+//         //         materilizedSVG: [
+//         //             materilizeSVG(devidedSVG[0]),
+//         //             materilizeSVG(devidedSVG[1]),
+//         //             materilizeSVG(devidedSVG[2])
+//         //         ]
+//         //     }
+//         // }))
 
 
-        /** init */
-        let proprtion = {n: .01}
-        let arr = myTitelsSVGs[0]
-        titles = [...myTitelsSVGs]
-        const changeProprtion = (value) => {
-            {n: value}
-        }
+//         /** init */
+//         let proprtion = {n: .01}
+//         let arr = myTitelsSVGs[0]
+//         titles = [...myTitelsSVGs]
+//         const changeProprtion = (value) => {
+//             {n: value}
+//         }
 
-        // add the svg to the scene and scale middle section
-        for(let i = 0; i < myTitelsSVGs.length; i++) {
-            for ( let j = 0; j < 3; j++ ) {
-                // todo change the 100 to be proprtional to the screen size
-                myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100)
-               // j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
-                scene.add(myTitelsSVGs[i].materilizedSVG[j])
-            }
-        }
+//         // add the svg to the scene and scale middle section
+//         for(let i = 0; i < myTitelsSVGs.length; i++) {
+//             for ( let j = 0; j < 3; j++ ) {
+//                 // todo change the 100 to be proprtional to the screen size
+//                 myTitelsSVGs[i].materilizedSVG[j].position.setX(i*100)
+//                // j === 1 ? myTitelsSVGs[i].materilizedSVG[1].scale.setX(proprtion.n) : null
+//                 scene.add(myTitelsSVGs[i].materilizedSVG[j])
+//             }
+//         }
 
         
 
-        //  translate the midle section and the last section
-        // let box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
-        // let box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
-        // arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
-        // arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
+//         //  translate the midle section and the last section
+//         // let box = new THREE.Box3().setFromObject( arr.materilizedSVG[1] )
+//         // let box3 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+//         // arr.materilizedSVG[1].translateX( (box.min.x-box3.min.x)/proprtion.n - box.min.x+box3.min.x) // how much to translate midel section 
+//         // arr.materilizedSVG[0].translateX( -(box.max.x - box.min.x)*(1-proprtion.n)/proprtion.n )   // how much  to translate the last part 
 
 
 
-        //center camera on the model
-        let box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
-        let box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
-        camera.position.setX(  (box2.max.x+box1.min.x)/2)
+//         //center camera on the model
+//         let box1 = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+//         let box2 = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+//         camera.position.setX(  (box2.max.x+box1.min.x)/2)
 
 
-        // camera snap positions
-        cameraSnapPositions = myTitelsSVGs.map(
-            (element) => {  
-                let box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
-                let box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
-                return  (box2.max.x+box1.min.x)/2
-            }
-        )
-        console.log(cameraSnapPositions)
+//         // camera snap positions
+//         cameraSnapPositions = myTitelsSVGs.map(
+//             (element) => {  
+//                 let box1 = new THREE.Box3().setFromObject( element.materilizedSVG[2] )
+//                 let box2 = new THREE.Box3().setFromObject( element.materilizedSVG[0] )
+//                 return  (box2.max.x+box1.min.x)/2
+//             }
+//         )
+//         console.log(cameraSnapPositions)
         
-        global = {...global, cameraSnapPositions: [...cameraSnapPositions]}
+//         global = {...global, cameraSnapPositions: [...cameraSnapPositions]}
 
        
 
 
-    }
+//     }
 
  
 
-    if ( targetEnverment() === "production" ) {
+//     if ( targetEnverment() === "production" ) {
 
-        const SVGURL = await fetchDownloadURL(mySVGRef)
-        //loadAsset(SVGURL,SVGloader)
-    }
-}
-
-
-const mySVGRef = ref( appStorage, 'about-me.svg')
+//         const SVGURL = await fetchDownloadURL(mySVGRef)
+//         //loadAsset(SVGURL,SVGloader)
+//     }
+// }
 
 
-// ! 
+// const mySVGRef = ref( appStorage, 'about-me.svg')
 
 
-global =  await myTitles(global) 
+// // ! 
 
 
-console.log(global)
-func ()
+// global =  await myTitles(global) 
 
 
-
-// ! todo: refacto 
-// * global stuff : try redux approach the store
-// * camera position 
-// * title objects 
-// *  
-
-// todo: find the  best distence between the titels 
-// todo: chnage camera position for each screen size
-
-// todo: create funciton to change camera position : 1. by time 2. by nav bar link
-
-// ! solve  impure functions isues 
-
-// ! important  create three js carousel function that takes svgs and elements and add to the scene carousel  
-// * spec: 
-
-// ! important handle the waiting time  when loading ... all stuff use the xhr
+// console.log(global)
+// func ()
 
 
 
-// * doc 
-// ? whaat 
-// normal 
+// // ! todo: refacto 
+// // * global stuff : try redux approach the store
+// // * camera position 
+// // * title objects 
+// // *  
+
+// // todo: find the  best distence between the titels 
+// // todo: chnage camera position for each screen size
+
+// // todo: create funciton to change camera position : 1. by time 2. by nav bar link
+
+// // ! solve  impure functions isues 
+
+// // ! important  create three js carousel function that takes svgs and elements and add to the scene carousel  
+// // * spec: 
+
+// // ! important handle the waiting time  when loading ... all stuff use the xhr
 
 
-const manageMiddleSection = ( n ) => {
 
-}
+// // * doc 
+// // ? whaat 
+// // normal 
 
 
+// const manageMiddleSection = ( n ) => {
 
-//todo: move this to lib 
-const centerCameraOnTitle = ( SVGTitle ) => {
-    let firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
-    let lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
-    camera.position.setX(  (firstSectionRange.max.x + lastSectionRange.min.x)/2)
-}
+// }
 
 
 
+// // //todo: move this to lib 
+// // const centerCameraOnTitle = ( SVGTitle ) => {
+// //     let firstSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[0] )
+// //     let lastSectionRange = new THREE.Box3().setFromObject( arr.materilizedSVG[2] )
+// //     camera.position.setX(  (firstSectionRange.max.x + lastSectionRange.min.x)/2)
+// // }
 
-// todo make all middle section null 
-global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
 
 
-// global.titles.length!==0 ?  global.titles.forEach(element => {
-//     scaleMidleSection(element,.5)
+
+// // // todo make all middle section null 
+// // global.titles.length!==0 ?  global.titles.forEach(element => {scaleMidleSection(element,.01)}) : null
+
+
+// // global.titles.length!==0 ?  global.titles.forEach(element => {
+// //     scaleMidleSection(element,.5)
     
-// }) : null
+// // }) : null
 
 
 
-//scaleMidleSection(global.titles[0], .01)
+// //scaleMidleSection(global.titles[0], .01)
 
 
 
-// todo romove buy me coffee then 
+// // todo romove buy me coffee then 
 
-// todo grab to move 
+// // todo grab to move 
 
-// todo rotate the titels so it looks vertical 
-
-
-// todo change the lerp function of the camera movement to a new the easy in easy out function
+// // todo rotate the titels so it looks vertical 
 
 
-//! todo rebuild the animation using window.requestAnimationFrame 
+// // todo change the lerp function of the camera movement to a new the easy in easy out function
+
+
+// //! todo rebuild the animation using window.requestAnimationFrame 
  
 
 
 
 
-// todo: loaders goes to lib 
-// todo: three js stuff goes to features
-// todo: annimation goes to features 
-// todo: fetch and load goes to services
-// todo: svg helpers and edit models goes to utils
-// todo: create 3D carousel and put it in the features
-// todo: create a carousel component and put it in the features
-
+// // todo: loaders goes to lib 
+// // todo: three js stuff goes to features
+// // todo: annimation goes to features 
+// // todo: fetch and load goes to services
+// // todo: svg helpers and edit models goes to utils
+// // todo: create 3D carousel and put it in the features
+// // todo: create a carousel component and put it in the features
 
 
 
