@@ -77,7 +77,19 @@ let done = false
 // ! **********************************************************************
 
 
+let color = [
+    0x00ff00,
+    0xff66ff,
+    0xffff00,
+    0x0066ff,
+    0xff0000,
+    0x006666,
+    0x9900ff,
+    0x996633,
+    0xff9933,
+    0x00ffcc
 
+]
 
 let meshes = []
 let scroll = 0
@@ -85,27 +97,29 @@ let scrollTarget = 0
 let currentScroll = 0
 let number = 10
 let boxSize = 10
+const margin = 30
+const wholeWidth = number*margin
 
-let createBox = () => {
+let createBox = (color) => {
     const geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } )
+    const material = new THREE.MeshBasicMaterial( { color: color } )
     const mesh = new THREE.Mesh( geometry, material )
     return mesh
 }
 
 
 let updateStuff = () => {
-    const margin = 20
-    const wholeWidth = number*margin
+
     meshes.forEach(obj=>{
+        //! this should be fixed not infinit : we should re-initiate after a while 
         obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
-        
     })
+
 }
 
 let createMeshesArr = () => {
     for(let i = 0; i < number; i++ ) {
-        let mesh = createBox()
+        let mesh = createBox(color[i])
         meshes.push({
             mesh,
             index: i
@@ -115,7 +129,7 @@ let createMeshesArr = () => {
 }
 
 let scrollEvent = () => {
-    document.addEventListener("mousewheel", (event)=>{
+    document.addEventListener("wheel", (event)=>{
         scrollTarget = event.wheelDelta*0.3
 
 
@@ -125,11 +139,51 @@ let scrollEvent = () => {
         updateStuff()
         renderer.render(scene, camera)
 
+
     })
-
-
-    
 }
+
+
+const  createWheelStopListener = (element, callback, timeout) => {
+    var handle = null;
+    var onScroll = function() {
+        if (handle) {
+            clearTimeout(handle)
+        }
+        handle = setTimeout(callback, timeout || 200)
+    }
+    element.addEventListener('wheel', onScroll)
+    return function() {
+        element.removeEventListener('wheel', onScroll)
+    }
+}
+
+const moveToSnapPosition = () => {
+    meshes.forEach(obj=>{
+        obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - currentScroll%margin
+    })
+}
+
+
+createWheelStopListener(window, function() {
+    
+    //moveToSnapPosition()
+    console.log(currentScroll%margin)
+    if(-(currentScroll%margin) > (margin/2)) {
+        console.log('go next')
+        meshes.forEach(obj=>{
+            obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - (currentScroll%margin + margin)
+        })
+        
+    } else {
+        console.log('go back')
+        meshes.forEach(obj=>{
+            obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - currentScroll%margin
+        })
+      
+    }
+})
+
 
 createMeshesArr()
 updateStuff()
@@ -137,38 +191,20 @@ scrollEvent()
 
 
 
+function animation() {
 
-let addStuffToScene = () => {
+    scroll += (scrollTarget - scroll)*0.1
+    scroll *= 0.5
+    scrollTarget *= 0.5
+    currentScroll += scroll*0.01
 
-}
-
-let stop = () => {
-
-}
-
-let play = () => {
-
-}
-
-let setupResize = () => {
+    requestAnimationFrame(animation)
+    
+    renderer.render(scene, camera)
 
 }
 
-
-    function animation() {
-
-        scroll += (scrollTarget - scroll)*0.1
-        scroll += (scrollTarget - scroll)*0.1
-        scroll *= 0.9
-        scrollTarget *= 0.9
-        currentScroll += scroll*0.01
-
-        requestAnimationFrame(animation)
-        renderer.render(scene, camera)
-
-    }
-
-    animation()
+animation()
 
 
 
