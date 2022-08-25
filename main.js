@@ -67,7 +67,10 @@ const changeCameraSnapPosition = ( arr ) => {
 
 
 
-const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame 
+const requestAnimationFrame =   window.requestAnimationFrame || 
+                                window.mozRequestAnimationFrame || 
+                                window.webkitRequestAnimationFrame || 
+                                window.msRequestAnimationFrame 
 
 let element  = document.getElementById("movingDiv")
 let start, previousTimeStamp
@@ -158,30 +161,37 @@ const  createWheelStopListener = (element, callback, timeout) => {
     }
 }
 
-const moveToSnapPosition = () => {
+const moveToPreviousPostion = () => {
+    console.log(currentScroll)
+
     meshes.forEach(obj=>{
-        obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - currentScroll%margin
+
+        let previousPostion = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - currentScroll%margin
+        obj.mesh.position.x = previousPostion
     })
+}
+
+const moveToNextPosition = () => {
+    meshes.forEach(obj=>{
+        let nextPosition = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - (currentScroll%margin + margin)
+        obj.mesh.position.x = nextPosition
+    })
+}
+
+const moveToSnapPosition = () => {
+    let isCloserToNext = -(currentScroll%margin) > (margin/2)
+    if(isCloserToNext) {
+        moveToNextPosition()
+    } else {
+        moveToPreviousPostion()
+    }
 }
 
 
 createWheelStopListener(window, function() {
     
-    //moveToSnapPosition()
-    console.log(currentScroll%margin)
-    if(-(currentScroll%margin) > (margin/2)) {
-        console.log('go next')
-        meshes.forEach(obj=>{
-            obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - (currentScroll%margin + margin)
-        })
-        
-    } else {
-        console.log('go back')
-        meshes.forEach(obj=>{
-            obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - currentScroll%margin
-        })
-      
-    }
+    moveToSnapPosition()
+
 })
 
 
@@ -197,6 +207,8 @@ function animation() {
     scroll *= 0.5
     scrollTarget *= 0.5
     currentScroll += scroll*0.01
+
+    //console.log(easeInOutQuad())
 
     requestAnimationFrame(animation)
     
