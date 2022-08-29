@@ -34,7 +34,7 @@ import { routes } from './router'
 
 import { async } from '@firebase/util'
 
-import easeInOutQuad from './utilities/animation/ease-in-out-quint.js'
+import easeInOutQuint from './utilities/animation/ease-in-out-quint.js'
 
 import loadAsset from './utilities/load-asset.js'
 
@@ -112,9 +112,7 @@ let createBox = (color) => {
 
 
 let updateStuff = () => {
-
     meshes.forEach(obj=>{
-        //! this should be fixed not infinit : we should re-initiate after a while 
         obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
     })
 
@@ -133,11 +131,9 @@ let createMeshesArr = () => {
 
 let scrollEvent = () => {
     document.addEventListener("wheel", (event)=>{
-        scrollTarget = event.wheelDelta*0.3
-
+        scrollTarget = event.wheelDelta*0.4
 
         currentScroll += scroll
-        //console.log(currentScroll)
 
         updateStuff()
         renderer.render(scene, camera)
@@ -148,7 +144,7 @@ let scrollEvent = () => {
 
 
 const  createWheelStopListener = (element, callback, timeout) => {
-    var handle = null;
+    var handle = null
     var onScroll = function() {
         if (handle) {
             clearTimeout(handle)
@@ -162,7 +158,7 @@ const  createWheelStopListener = (element, callback, timeout) => {
 }
 
 const moveToPreviousPostion = () => {
-    console.log(currentScroll)
+    //console.log(currentScroll)
 
     meshes.forEach(obj=>{
 
@@ -176,10 +172,11 @@ const moveToNextPosition = () => {
         let nextPosition = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin - (currentScroll%margin + margin)
         obj.mesh.position.x = nextPosition
     })
-}
+} 
 
 const moveToSnapPosition = () => {
     let isCloserToNext = -(currentScroll%margin) > (margin/2)
+    frame = 0
     if(isCloserToNext) {
         moveToNextPosition()
     } else {
@@ -188,18 +185,19 @@ const moveToSnapPosition = () => {
 }
 
 
-createWheelStopListener(window, function() {
-    
-    moveToSnapPosition()
 
-})
+
+
+
+
+
 
 
 createMeshesArr()
 updateStuff()
 scrollEvent()
 
-
+let frame = 0
 
 function animation() {
 
@@ -207,12 +205,20 @@ function animation() {
     scroll *= 0.5
     scrollTarget *= 0.5
     currentScroll += scroll*0.01
-
-    //console.log(easeInOutQuad())
-
+    frame += 1
+    console.log(frame)
     requestAnimationFrame(animation)
     
     renderer.render(scene, camera)
+
+    createWheelStopListener(window, function() {
+        
+        console.log(frame)
+        console.log(easeInOutQuint(frame,1,4,20))
+        moveToSnapPosition()
+    
+    })
+    //console.log(currentScroll)
 
 }
 
