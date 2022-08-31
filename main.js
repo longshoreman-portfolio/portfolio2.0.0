@@ -106,9 +106,9 @@ let positions = []
 let duration = 20
 let frame = 0
 
-let distanceToTarget = 0
+let distanceToNext = 0
 let isCloserToNext = false
-let nextPosition = 0
+let targetPostion = 0
 
 let createBox = (color) => {
     let geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
@@ -117,15 +117,16 @@ let createBox = (color) => {
     return mesh
 }
 
+let distanceToTargetPosition = (isCloserToNext, margin, currentScroll) => {
+    let value = 0 
+    isCloserToNext?value=-(currentScroll%margin) - margin:value=-(currentScroll%margin)
+    return value
+}
 
-let gapInCurrentScroll = (isCloserToNext, frame, duration, margin, currentScroll) => {
+let gapInCurrentScroll = ( frame, duration, distance ) => {
     let gap = 0
     if (frame === duration ) {
-        if (isCloserToNext) {
-            gap = -(currentScroll%margin) - margin
-        } else {
-            gap = -(currentScroll%margin)
-        }
+        gap = distance
     }
     return gap
 }
@@ -203,24 +204,22 @@ function animation() {
     frame += 1
     
    
+    let distance = distanceToTargetPosition(isCloserToNext, margin, currentScroll)
 
+
+    distanceToNext = -(currentScroll%margin) 
+    isCloserToNext = distanceToNext > (margin/2)
     
-    distanceToTarget = -(currentScroll%margin) 
-    isCloserToNext = distanceToTarget > (margin/2)
-    nextPosition = -(currentScroll%margin)
     
     if(frame <= duration ) {
         meshes.forEach(obj=>{
-            if (isCloserToNext) {
-                nextPosition = -(currentScroll%margin) - margin     
-            } else {
-                nextPosition = -(currentScroll%margin) 
-            }
-            obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],nextPosition,duration)
+            obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration)
         })
     }
 
-    currentScroll += gapInCurrentScroll(isCloserToNext, frame, duration, margin, currentScroll) 
+
+    
+    currentScroll += gapInCurrentScroll( frame, duration, distance ) 
     
 
     
