@@ -118,6 +118,18 @@ let createBox = (color) => {
 }
 
 
+let gapInCurrentScroll = (isCloserToNext, frame, duration, margin, currentScroll) => {
+    let gap = 0
+    if (frame === duration ) {
+        if (isCloserToNext) {
+            gap = -(currentScroll%margin) - margin
+        } else {
+            gap = -(currentScroll%margin)
+        }
+    }
+    return gap
+}
+
 let updateStuff = () => {
     meshes.forEach(obj=>{
         obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
@@ -206,16 +218,13 @@ function animation() {
             }
             obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],nextPosition,duration)
         })
-    } 
-    
-    if (frame === duration ) {
-        if (isCloserToNext) {
-            currentScroll += -(currentScroll%margin) - margin
-        } else {
-            currentScroll += -(currentScroll%margin)
-        }
     }
+
+    currentScroll += gapInCurrentScroll(isCloserToNext, frame, duration, margin, currentScroll) 
     
+
+    
+
     
     createWheelStopListener(window, function() {
         
