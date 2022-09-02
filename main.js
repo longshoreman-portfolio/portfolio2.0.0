@@ -47,7 +47,7 @@ const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
 
 let global = {
-    camera: {position: new THREE.Vector3(0,15,60)},
+    camera: {position: new THREE.Vector3(0,15,600)},
     titles: [],
     cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
@@ -107,6 +107,7 @@ let duration = 20
 let frame = 0
 
 let distanceToNext = 0
+let distance = 0
 let isCloserToNext = false
 let targetPostion = 0
 
@@ -117,28 +118,32 @@ let createBox = (color) => {
     return mesh
 }
 
-let distanceToTargetPosition = (isCloserToNext, margin, currentScroll) => {
-    let value = 0 
-    isCloserToNext?value=-(currentScroll%margin) - margin:value=-(currentScroll%margin)
-    return value
+let distanceToTargetPosition = ( isCloserToNext, margin, currentScroll ) => {
+    return isCloserToNext? -(currentScroll%margin) - margin: -(currentScroll%margin)
 }
 
-let gapInCurrentScroll = ( frame, duration, distance ) => {
-    let gap = 0
-    if (frame === duration ) {
-        gap = distance
-    }
-    return gap
+let lagInCurrnetScroll = ( frame, duration, distance ) => {
+    let isAnimationEnded = frame === duration
+    return isAnimationEnded? distance: null
 }
 
-let updateStuff = () => {
+
+let updateModelsPositionsOnScrolling = () => {
     meshes.forEach(obj=>{
         obj.mesh.position.x = ( margin*obj.index + currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
         positions[obj.index] = obj.mesh.position.x 
     })
-
 }
 
+let updateModelsPositionsOnAnimation = ( meshes, frame, distance, duration ) => {
+    let isAnimationOn = frame <= duration
+    let arr = [...meshes]
+    isAnimationOn? arr.forEach(obj=>{ obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration) }):null
+    return arr
+}
+
+
+//! moch
 let createMeshesArr = () => {
     for(let i = 0; i < number; i++ ) {
         let mesh = createBox(color[i])
@@ -156,7 +161,7 @@ let scrollEvent = () => {
         scrollTarget = event.wheelDelta*0.1
         currentScroll += scroll
 
-        updateStuff()
+        updateModelsPositionsOnScrolling()
         renderer.render(scene, camera)
     })
 }
@@ -190,48 +195,35 @@ const resetFrame = () => {
 
 
 createMeshesArr()
-updateStuff()
+updateModelsPositionsOnScrolling()
 scrollEvent()
 
 
 
 function animation() {
-
     scroll += (scrollTarget - scroll)*0.5
     scroll *= 0.5
     scrollTarget *= 0.5
     currentScroll += scroll*0.01
     frame += 1
     
-   
-    let distance = distanceToTargetPosition(isCloserToNext, margin, currentScroll)
+    distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
+    isCloserToNext = Math.abs(distanceToNext) > (margin/2) //! this may be the issue with the direction 
+    distance = distanceToTargetPosition(isCloserToNext, margin, currentScroll)
 
 
-    distanceToNext = -(currentScroll%margin) 
-    isCloserToNext = distanceToNext > (margin/2)
-    
-    
-    if(frame <= duration ) {
-        meshes.forEach(obj=>{
-            obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration)
-        })
-    }
+    console.log(currentScroll.toFixed(3))
 
-
-    
-    currentScroll += gapInCurrentScroll( frame, duration, distance ) 
+    meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
     
 
     
-
+    currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
     
+
     createWheelStopListener(window, function() {
-        
         resetFrame()
-
-        meshes.forEach(obj=>{
-            positions[obj.index] = obj.mesh.position.x
-        })
+        updateModelsPositionsOnScrolling()
     })
 
 
