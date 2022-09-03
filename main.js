@@ -109,6 +109,7 @@ let frame = 0
 let distanceToNext = 0
 let distance = 0
 let isCloserToNext = false
+let isCloserToPrevious = false
 let targetPostion = 0
 
 let createBox = (color) => {
@@ -118,8 +119,17 @@ let createBox = (color) => {
     return mesh
 }
 
-let distanceToTargetPosition = ( isCloserToNext, margin, currentScroll ) => {
-    return isCloserToNext? -(currentScroll%margin) - margin: -(currentScroll%margin)
+let distanceToTargetPosition = ( isCloserToNext, isCloserToPrevious, margin, currentScroll ) => {
+    let distance = 0
+    if (isCloserToNext) {
+        distance = -(currentScroll%margin) - margin
+    } else if (isCloserToPrevious) {
+        distance = -(currentScroll%margin) + margin
+    } else {
+        distance = -(currentScroll%margin)
+    }
+    return distance
+    //return isCloserToNext? -(currentScroll%margin) - margin: -(currentScroll%margin)
 }
 
 let lagInCurrnetScroll = ( frame, duration, distance ) => {
@@ -208,11 +218,14 @@ function animation() {
     frame += 1
     
     distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
-    isCloserToNext = Math.abs(distanceToNext) > (margin/2) //! this may be the issue with the direction 
-    distance = distanceToTargetPosition(isCloserToNext, margin, currentScroll)
+    isCloserToNext = distanceToNext > (margin/2) //! this may be the issue with the direction 
+    isCloserToPrevious = distanceToNext < -(margin/2) //! finish the logic behuiind this 
 
+    
+    distance = distanceToTargetPosition(isCloserToNext, isCloserToPrevious, margin, currentScroll)
 
-    console.log(currentScroll.toFixed(3))
+    isCloserToPrevious? console.log(" CloserToPrevious "):null
+    console.log(distanceToNext.toFixed(3) )
 
     meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
     
