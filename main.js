@@ -98,7 +98,7 @@ let meshes = []
 let scroll = 0
 let scrollTarget = 0
 let currentScroll = 0
-let number = 10
+let number = 5
 let boxSize = 10
 let margin = 30
 let wholeWidth = number*margin
@@ -111,6 +111,7 @@ let distance = 0
 let isCloserToNext = false
 let isCloserToPrevious = false
 let targetPostion = 0
+let isAnimationStarted
 
 let createBox = (color) => {
     let geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
@@ -129,7 +130,6 @@ let distanceToTargetPosition = ( isCloserToNext, isCloserToPrevious, margin, cur
         distance = -(currentScroll%margin)
     }
     return distance
-    //return isCloserToNext? -(currentScroll%margin) - margin: -(currentScroll%margin)
 }
 
 let lagInCurrnetScroll = ( frame, duration, distance ) => {
@@ -210,40 +210,50 @@ scrollEvent()
 
 
 
+
 function animation() {
+
+    //! remove fucntions and do math when neeeded only
+
+
+    if (scroll =! 0) {
+    
     scroll += (scrollTarget - scroll)*0.5
-    scroll *= 0.5
-    scrollTarget *= 0.5
-    currentScroll += scroll*0.01
+    scroll = 0.5*scroll.toFixed(3)
+    scrollTarget = 0.5*scrollTarget.toFixed(3)
+    currentScroll = (scroll*0.01 + currentScroll)
     frame += 1
     
+    //todo: to abstract
+    //! those need to be calculated when the scrolling stops 
     distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
-    isCloserToNext = distanceToNext > (margin/2) //! this may be the issue with the direction 
-    isCloserToPrevious = distanceToNext < -(margin/2) //! finish the logic behuiind this 
+    isCloserToNext = distanceToNext > (margin/2)
+    isCloserToPrevious = distanceToNext < -(margin/2) 
+
 
     
     distance = distanceToTargetPosition(isCloserToNext, isCloserToPrevious, margin, currentScroll)
 
-    isCloserToPrevious? console.log(" CloserToPrevious "):null
-    console.log(distanceToNext.toFixed(3) )
+   
+   
 
     meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
     
-
+   
     
     currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
     
-
+}
     createWheelStopListener(window, function() {
         resetFrame()
         updateModelsPositionsOnScrolling()
     })
 
-
-    requestAnimationFrame(animation)
-    renderer.render(scene, camera)
-
-  
+    setTimeout(() => {
+    
+        requestAnimationFrame(animation)
+        renderer.render(scene, camera)
+    }, 1000 / 60)
 
 }
 
