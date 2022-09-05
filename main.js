@@ -111,7 +111,7 @@ let distance = 0
 let isCloserToNext = false
 let isCloserToPrevious = false
 let targetPostion = 0
-let isAnimationStarted
+let isAnimationStarted = false
 
 let createBox = (color) => {
     let geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
@@ -168,11 +168,10 @@ let createMeshesArr = () => {
 
 let scrollEvent = () => {
     document.addEventListener("wheel", (event)=>{
-        scrollTarget = event.wheelDelta*0.1
+        scrollTarget = event.wheelDelta*0.5
         currentScroll += scroll
-
         updateModelsPositionsOnScrolling()
-        renderer.render(scene, camera)
+        //renderer.render(scene, camera)
     })
 }
 
@@ -209,51 +208,55 @@ updateModelsPositionsOnScrolling()
 scrollEvent()
 
 
+createWheelStopListener(window, function() {
+    resetFrame()
+    isAnimationStarted=true
+    updateModelsPositionsOnScrolling()
+})
 
 
 function animation() {
-
+   
     //! remove fucntions and do math when neeeded only
 
+    //! this intruduce a bouncing effect 
+    if (true) {
+        scroll += (scrollTarget - scroll)*0.5
+        scroll = 0.5*scroll.toFixed(3)
+        scrollTarget = 0.5*scrollTarget.toFixed(3)
+        currentScroll += (scroll*0.01)
+    }
 
-    if (scroll =! 0) {
-    
-    scroll += (scrollTarget - scroll)*0.5
-    scroll = 0.5*scroll.toFixed(3)
-    scrollTarget = 0.5*scrollTarget.toFixed(3)
-    currentScroll = (scroll*0.01 + currentScroll)
+
+
     frame += 1
     
     //todo: to abstract
     //! those need to be calculated when the scrolling stops 
-    distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
-    isCloserToNext = distanceToNext > (margin/2)
-    isCloserToPrevious = distanceToNext < -(margin/2) 
+    //! when the animations starts and when it ends  
 
+    if(isAnimationStarted ) {
+        console.log('animation')
+        distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
+        isCloserToNext = distanceToNext > (margin/2)
+        isCloserToPrevious = distanceToNext < -(margin/2)     
+        distance = distanceToTargetPosition(isCloserToNext, isCloserToPrevious, margin, currentScroll)
+        meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
+        currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
+    }
+    if(frame===duration){
+        isAnimationStarted = false
+    }
+    
 
     
-    distance = distanceToTargetPosition(isCloserToNext, isCloserToPrevious, margin, currentScroll)
+ 
 
+
+
+    requestAnimationFrame(animation)
+    renderer.render(scene, camera)
    
-   
-
-    meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
-    
-   
-    
-    currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
-    
-}
-    createWheelStopListener(window, function() {
-        resetFrame()
-        updateModelsPositionsOnScrolling()
-    })
-
-    setTimeout(() => {
-    
-        requestAnimationFrame(animation)
-        renderer.render(scene, camera)
-    }, 1000 / 60)
 
 }
 
