@@ -80,6 +80,7 @@ let done = false
 // ! **********************************************************************
 
 
+
 let color = [
     0x00ff00,
     0xff66ff,
@@ -94,24 +95,34 @@ let color = [
 
 ]
 
-let meshes = []
-let scroll = 0
-let scrollTarget = 0
-let currentScroll = 0
-let number = 5
-let boxSize = 10
-let margin = 30
-let wholeWidth = number*margin
-let positions = []
-let duration = 20
+let meshes = [] //! this is a moch : will be remplaced by fetch titles 
+
+//todo obj
+let scroll = 0  // state of the carousel 
+let scrollTarget = 0    // state of the carousel 
+let currentScroll = 0   // state of the carousel 
+
+
+let number = 5 //! moch
+let boxSize = 10 //! moch
+
+let margin = 30 // state of the carousel  //!  propotional to windows widht
+let wholeWidth = number*margin 
+
+
+let positions = [] // state of the carousel 
+
+
+let duration = 20 //! this is not duration this is the frame number per animation 
 let frame = 0
 
-let distanceToNext = 0
-let distance = 0
-let isCloserToNext = false
-let isCloserToPrevious = false
-let targetPostion = 0
-let isAnimationStarted = false
+
+let isAnimationStarted = false  // state of the carousel 
+
+
+let getMeshesPositions = (meshes) => {
+    return meshes.map(obj=>obj.mesh.position.x)
+}
 
 let createBox = (color) => {
     let geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
@@ -120,17 +131,27 @@ let createBox = (color) => {
     return mesh
 }
 
-let distanceToTargetPosition = ( isCloserToNext, isCloserToPrevious, margin, currentScroll ) => {
-    let distance = 0
-    if (isCloserToNext) {
-        distance = -(currentScroll%margin) - margin
-    } else if (isCloserToPrevious) {
-        distance = -(currentScroll%margin) + margin
+let distanceToTargetPosition = ( margin, currentScroll ) => {
+    let value = 0
+    if (isCloserToNext( currentScroll, margin )) {
+        value = -(currentScroll%margin) - margin
+    } else if (isCloserToPrevious( currentScroll, margin )) {
+        value = -(currentScroll%margin) + margin
     } else {
-        distance = -(currentScroll%margin)
+        value = -(currentScroll%margin)
     }
-    return distance
+    return value
 }
+
+
+let isCloserToNext = ( currentScroll, margin ) => {
+    return -(currentScroll%margin) > (margin/2)
+}
+
+let isCloserToPrevious = ( currentScroll, margin ) => {
+    return -(currentScroll%margin) < -(margin/2) 
+}
+
 
 let lagInCurrnetScroll = ( frame, duration, distance ) => {
     let isAnimationEnded = frame === duration
@@ -145,7 +166,7 @@ let updateModelsPositionsOnScrolling = () => {
     })
 }
 
-let updateModelsPositionsOnAnimation = ( meshes, frame, distance, duration ) => {
+let updateModelsPositionsOnAnimation = ( pos, meshes, frame, distance, duration ) => {
     let isAnimationOn = frame <= duration
     let arr = [...meshes]
     isAnimationOn? arr.forEach(obj=>{ obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration) }):null
@@ -157,7 +178,7 @@ let updateModelsPositionsOnAnimation = ( meshes, frame, distance, duration ) => 
 let createMeshesArr = () => {
     for(let i = 0; i < number; i++ ) {
         let mesh = createBox(color[i])
-        positions.push(0)
+        positions.push(0) // pos init 
         meshes.push({
             mesh,
             index: i
@@ -168,10 +189,9 @@ let createMeshesArr = () => {
 
 let scrollEvent = () => {
     document.addEventListener("wheel", (event)=>{
-        scrollTarget = event.wheelDelta*0.5
+        scrollTarget = event.wheelDelta*0.2
         currentScroll += scroll
         updateModelsPositionsOnScrolling()
-        //renderer.render(scene, camera)
     })
 }
 
@@ -200,9 +220,6 @@ const resetFrame = () => {
 
 
 
-
-
-
 createMeshesArr()
 updateModelsPositionsOnScrolling()
 scrollEvent()
@@ -210,50 +227,32 @@ scrollEvent()
 
 createWheelStopListener(window, function() {
     resetFrame()
-    isAnimationStarted=true
     updateModelsPositionsOnScrolling()
+    isAnimationStarted=true
 })
 
 
 function animation() {
-   
-    //! remove fucntions and do math when neeeded only
 
-    //! this intruduce a bouncing effect 
-    if (true) {
-        scroll += (scrollTarget - scroll)*0.5
-        scroll = 0.5*scroll.toFixed(3)
-        scrollTarget = 0.5*scrollTarget.toFixed(3)
-        currentScroll += (scroll*0.01)
-    }
-
-
+    scroll += (scrollTarget - scroll)*0.5
+    scroll = 0.5*scroll.toFixed(3)
+    scrollTarget = 0.5*scrollTarget.toFixed(3)
+    currentScroll += (scroll*0.01)
 
     frame += 1
     
     //todo: to abstract
-    //! those need to be calculated when the scrolling stops 
-    //! when the animations starts and when it ends  
 
     if(isAnimationStarted ) {
-        console.log('animation')
-        distanceToNext = -(currentScroll.toFixed(3)%margin).toFixed(3)
-        isCloserToNext = distanceToNext > (margin/2)
-        isCloserToPrevious = distanceToNext < -(margin/2)     
-        distance = distanceToTargetPosition(isCloserToNext, isCloserToPrevious, margin, currentScroll)
-        meshes = updateModelsPositionsOnAnimation(meshes,frame,distance,duration)
+        let distance = distanceToTargetPosition( margin, currentScroll)
+        let positions = getMeshesPositions( meshes )
+        meshes = updateModelsPositionsOnAnimation( positions, meshes, frame, distance, duration )
         currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
     }
     if(frame===duration){
         isAnimationStarted = false
     }
     
-
-    
- 
-
-
-
     requestAnimationFrame(animation)
     renderer.render(scene, camera)
    
@@ -266,75 +265,6 @@ animation()
 
 // ! **********************************************************************
 
-
-/** junk*/
-/**
- <html>
-<head>
-   <style>
-      #movingDiv {
-         position: relative;
-         width: 200px;
-         height: 200px;
-      }
-   </style>
-</head>
-<body>
-   <div id="movingDiv"> This is my moving div! </div>
-   <script>
-   
-       
-    //t is the current time (framenumber) of the transition
-
-	//b is the beginning value of the property
-
-	//c is the change between the beginning and destination value of the property
-
-	//d is the total length of the transition
-   
-  
-      function easeInOutQuint(t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t*t*t*t + b;
-        t -= 2;
-        return c/2*(t*t*t*t*t + 2) + b;
-      };
-   
-   	let element  = document.getElementById("movingDiv");
-   	let start, previousTimeStamp;
-    let done = false
-
-    function step(timestamp) {
-      if (start === undefined) {
-        start = timestamp;
-        }
-      const elapsed = timestamp - start;
-
-      if (previousTimeStamp !== timestamp) {
-        // Math.min() is used here to make sure the element stops at exactly 200px
-        
-        
-        const count = easeInOutQuint(elapsed, 0, 200, 2000)
-        element.style.transform = `translateX(${count}px)`;
-        if (count === 200) done = true;
-      }
-
-      if (elapsed < 2000) { // Stop the animation after 2 seconds
-        previousTimeStamp = timestamp;
-        if (!done) {
-          window.requestAnimationFrame(step);
-        }
-      }
-    }
-
-    window.requestAnimationFrame(step);
-      
-      
-       
-   </script>
-</body>
-</html>
- */
 
 
 // //todo: this goes to services
