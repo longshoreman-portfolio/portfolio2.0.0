@@ -119,18 +119,54 @@ let frame = 0
 
 let isAnimationStarted = false  // state of the carousel 
 
+let previousTouch
+let touchStartEvent = () => {
+    document.addEventListener("touchstart", ()=>{
+        touchMoveEvent()
+    })
+}
+
+let touchEndEvent = () => {
+    document.addEventListener("touchend", ()=>{
+        document.removeEventListener('mousemove',handleTouchMove)
+        resetFrame()
+        updateModelsPositionsOnScrolling()
+        isAnimationStarted=true
+
+    })
+}
+
+
+let touchMoveEvent = () => {
+    document.addEventListener("touchmove", handleTouchMove)
+}
+
+
+
+let handleTouchMove = (event) => {
+ 
+        const touch = event.touches[0]
+
+        if(previousTouch){
+            event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
+            scrollTarget = event.movementX*2.5
+            currentScroll += scroll
+            updateModelsPositionsOnScrolling()           
+        }
+        previousTouch = touch 
+}
+
+
+
 
 let mouseDownEvent = () => {
-    //call for event listener  for mouse move 
-    document.addEventListener("mousedown", (event) => {
-        console.log('down')
+    document.addEventListener("mousedown", () => {
         mouseMoveEvent()
     });
 }
 
 let mouseUpEvent = () => {
-    document.addEventListener("mouseup", (event) => {
-        console.log('up')
+    document.addEventListener("mouseup", () => {
         document.removeEventListener('mousemove',handleMosueMove)
         resetFrame()
         updateModelsPositionsOnScrolling()
@@ -140,12 +176,10 @@ let mouseUpEvent = () => {
 
 let mouseMoveEvent = () => {
     document.addEventListener("mousemove", handleMosueMove)
-
 }
 
 
 let handleMosueMove = (event) => {
-    console.log(event.movementX)
     scrollTarget = event.movementX*0.7
     currentScroll += scroll
     updateModelsPositionsOnScrolling()
@@ -256,6 +290,8 @@ const resetFrame = () => {
 mouseDownEvent()
 mouseUpEvent()
 
+touchStartEvent()
+touchEndEvent()
 
 
 createMeshesArr()
