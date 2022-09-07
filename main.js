@@ -120,6 +120,41 @@ let frame = 0
 let isAnimationStarted = false  // state of the carousel 
 
 
+let mouseDownEvent = () => {
+    //call for event listener  for mouse move 
+    document.addEventListener("mousedown", (event) => {
+        console.log('down')
+        mouseMoveEvent()
+    });
+}
+
+let mouseUpEvent = () => {
+    document.addEventListener("mouseup", (event) => {
+        console.log('up')
+        document.removeEventListener('mousemove',handleMosueMove)
+        resetFrame()
+        updateModelsPositionsOnScrolling()
+        isAnimationStarted=true
+    })
+}
+
+let mouseMoveEvent = () => {
+    document.addEventListener("mousemove", handleMosueMove)
+
+}
+
+
+let handleMosueMove = (event) => {
+    console.log(event.movementX)
+    scrollTarget = event.movementX*0.7
+    currentScroll += scroll
+    updateModelsPositionsOnScrolling()
+}
+
+
+
+
+
 let getMeshesPositions = (meshes) => {
     return meshes.map(obj=>obj.mesh.position.x)
 }
@@ -166,7 +201,7 @@ let updateModelsPositionsOnScrolling = () => {
     })
 }
 
-let updateModelsPositionsOnAnimation = ( pos, meshes, frame, distance, duration ) => {
+let updateModelsPositionsOnAnimation = ( meshes, frame, distance, duration ) => {
     let isAnimationOn = frame <= duration
     let arr = [...meshes]
     isAnimationOn? arr.forEach(obj=>{ obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration) }):null
@@ -196,9 +231,9 @@ let scrollEvent = () => {
 }
 
 
-const  createWheelStopListener = (element, callback, timeout) => {
-    var handle = null
-    var onScroll = function() {
+let  createWheelStopListener = (element, callback, timeout) => {
+    let handle = null
+    let onScroll = function() {
         if (handle) {
             clearTimeout(handle)
         }
@@ -217,6 +252,9 @@ const resetFrame = () => {
 
 
 
+
+mouseDownEvent()
+mouseUpEvent()
 
 
 
@@ -241,12 +279,9 @@ function animation() {
 
     frame += 1
     
-    //todo: to abstract
-
     if(isAnimationStarted ) {
         let distance = distanceToTargetPosition( margin, currentScroll)
-        let positions = getMeshesPositions( meshes )
-        meshes = updateModelsPositionsOnAnimation( positions, meshes, frame, distance, duration )
+        meshes = updateModelsPositionsOnAnimation( meshes, frame, distance, duration )
         currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
     }
     if(frame===duration){
