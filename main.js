@@ -47,7 +47,7 @@ const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
 
 let global = {
-    camera: {position: new THREE.Vector3(0,15,600)},
+    camera: {position: new THREE.Vector3(0,15,60)},
     titles: [],
     cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
@@ -119,13 +119,7 @@ let frame = 0
 
 let isAnimationStarted = false  // state of the carousel 
 
-
-let counter = 0 
-let autoScroll = () => {
-
-}
-
-
+let sensitivityCoefficient = 1
 
 
 
@@ -142,7 +136,6 @@ let touchEndEvent = () => {
         resetFrame()
         updateModelsPositionsOnScrolling()
         isAnimationStarted=true
-
     })
 }
 
@@ -159,7 +152,7 @@ let handleTouchMove = (event) => {
 
         if(previousTouch){
             event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
-            scrollTarget = event.movementX*2.5
+            scrollTarget = event.movementX*2.5*sensitivityCoefficient
             currentScroll += scroll
             updateModelsPositionsOnScrolling()           
         }
@@ -196,7 +189,7 @@ let mouseMoveEvent = () => {
 
 
 let handleMosueMove = (event) => {
-    scrollTarget = event.movementX*0.7
+    scrollTarget = event.movementX*0.2*sensitivityCoefficient
     currentScroll += scroll
     updateModelsPositionsOnScrolling()
 }
@@ -209,7 +202,7 @@ let mouseEvent = () => {
 
 let wheelStartEnvent = ( ) => {
     document.addEventListener("wheel", (event)=>{
-        scrollTarget = event.wheelDelta*0.2
+        scrollTarget = event.wheelDelta*0.1*sensitivityCoefficient
         currentScroll += scroll
         updateModelsPositionsOnScrolling()
     })
@@ -291,7 +284,15 @@ let updateModelsPositionsOnScrolling = () => {
 let updateModelsPositionsOnAnimation = ( meshes, frame, distance, duration ) => {
     let isAnimationOn = frame <= duration
     let arr = [...meshes]
-    isAnimationOn? arr.forEach(obj=>{ obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration) }):null
+    
+
+    if(isAnimationOn) {
+        arr.forEach(
+            obj=>{ 
+                obj.mesh.position.x = easeInOutQuint(frame,positions[obj.index],distance,duration) 
+            }
+        )
+    }
     return arr
 }
 
@@ -309,11 +310,45 @@ let createMeshesArr = () => {
     }
 }
 
-const resetFrame = () => {
+let  resetFrame = () => {
     frame = 0
 }
 
+let scaleSection = (mesh,scale) => {
 
+    
+    
+}
+
+
+
+
+
+
+let scaleSections = (scale) => {
+    
+    meshes.forEach(
+        obj=>{ 
+            obj.mesh.scale.setX(scale)
+        }
+    )
+    
+}
+
+
+
+let easeInOutSin = (t, b, c, d) => {
+	return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+}
+
+let curve = (pos ) => {
+   return easeInOutSin(pos , 1 , .55 , 7)
+}
+
+
+let updateSensitivity = (pos) => {
+    return easeInOutQuint(pos , .4 , 1 , 6)
+}
 
 
 
@@ -329,18 +364,33 @@ updateModelsPositionsOnScrolling()
 
 function animation() {
 
+   
     scroll += (scrollTarget - scroll)*0.5
     scroll = 0.5*scroll.toFixed(3)
     scrollTarget = 0.5*scrollTarget.toFixed(3)
     currentScroll += (scroll*0.01)
-
+    
     frame += 1
-    counter += 1
+
+
+    let position = Math.abs((meshes[0].mesh.position.x)%margin).toFixed(2) 
+    sensitivityCoefficient=1.3
+
+    if ( position <= 7 ) {
+        scaleSections (curve(position).toFixed(5))
+        sensitivityCoefficient = updateSensitivity(position)
+    }
+
+    if ( position >= margin - 7  ) {
+        scaleSections (curve(margin-position).toFixed(5))
+        sensitivityCoefficient = updateSensitivity(margin-position)
+    }
     
     if(isAnimationStarted ) {
         let distance = distanceToTargetPosition( margin, currentScroll)
         meshes = updateModelsPositionsOnAnimation( meshes, frame, distance, duration )
         currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
+        
     }
     if(frame===duration){
         isAnimationStarted = false
