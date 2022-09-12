@@ -119,6 +119,16 @@ let frame = 0
 
 let isAnimationStarted = false  // state of the carousel 
 
+
+let counter = 0 
+let autoScroll = () => {
+
+}
+
+
+
+
+
 let previousTouch
 let touchStartEvent = () => {
     document.addEventListener("touchstart", ()=>{
@@ -157,6 +167,12 @@ let handleTouchMove = (event) => {
 }
 
 
+let touchEvent = () => {
+    touchStartEvent()
+    touchEndEvent()
+}
+
+
 
 
 let mouseDownEvent = () => {
@@ -186,12 +202,49 @@ let handleMosueMove = (event) => {
 }
 
 
-
-
-
-let getMeshesPositions = (meshes) => {
-    return meshes.map(obj=>obj.mesh.position.x)
+let mouseEvent = () => {
+    mouseDownEvent()
+    mouseUpEvent()
 }
+
+let wheelStartEnvent = ( ) => {
+    document.addEventListener("wheel", (event)=>{
+        scrollTarget = event.wheelDelta*0.2
+        currentScroll += scroll
+        updateModelsPositionsOnScrolling()
+    })
+}
+
+let wheelStopEvent = () => {
+    createWheelStopListener(window, handleWheelStop)
+}
+
+let handleWheelStop = () => { 
+    resetFrame()
+    updateModelsPositionsOnScrolling()
+    isAnimationStarted=true
+}
+
+let  createWheelStopListener = (element, callback, timeout) => {
+    let handle = null
+    let onScroll = function() {
+        if (handle) {
+            clearTimeout(handle)
+        }
+        handle = setTimeout(callback, timeout || 300)
+    }
+    element.addEventListener('wheel', onScroll)
+    return function() {
+
+        element.removeEventListener('wheel', onScroll)
+    }
+}
+
+let wheelEvent = () => {
+    wheelStartEnvent()
+    wheelStopEvent()
+}
+
 
 let createBox = (color) => {
     let geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize )
@@ -256,29 +309,6 @@ let createMeshesArr = () => {
     }
 }
 
-let scrollEvent = () => {
-    document.addEventListener("wheel", (event)=>{
-        scrollTarget = event.wheelDelta*0.2
-        currentScroll += scroll
-        updateModelsPositionsOnScrolling()
-    })
-}
-
-
-let  createWheelStopListener = (element, callback, timeout) => {
-    let handle = null
-    let onScroll = function() {
-        if (handle) {
-            clearTimeout(handle)
-        }
-        handle = setTimeout(callback, timeout || 300)
-    }
-    element.addEventListener('wheel', onScroll)
-    return function() {
-        element.removeEventListener('wheel', onScroll)
-    }
-}
-
 const resetFrame = () => {
     frame = 0
 }
@@ -287,23 +317,14 @@ const resetFrame = () => {
 
 
 
-mouseDownEvent()
-mouseUpEvent()
-
-touchStartEvent()
-touchEndEvent()
-
-
-createMeshesArr()
+mouseEvent()
+touchEvent()
+wheelEvent()
+createMeshesArr()//! moch
 updateModelsPositionsOnScrolling()
-scrollEvent()
 
 
-createWheelStopListener(window, function() {
-    resetFrame()
-    updateModelsPositionsOnScrolling()
-    isAnimationStarted=true
-})
+
 
 
 function animation() {
@@ -314,6 +335,7 @@ function animation() {
     currentScroll += (scroll*0.01)
 
     frame += 1
+    counter += 1
     
     if(isAnimationStarted ) {
         let distance = distanceToTargetPosition( margin, currentScroll)
