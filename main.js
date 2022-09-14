@@ -26,7 +26,7 @@ import * as dat from 'dat.gui'
 
 import {  ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
 
-import { app , appStorage }  from './firebase-config.js'
+import { app, appStorage, db }  from './firebase-config.js'
 
 import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
 
@@ -49,6 +49,9 @@ import getRawTitles from './utilities/get-raw-titles.js'
 
 import materilizeTitles from './utilities/materilize-titles'
 
+import { ENV_CONST } from './data/env'
+
+import { titlesList } from './data/titles-list'
 
 /** global */
 //!!! impotatnt !!!
@@ -491,26 +494,29 @@ animation()
 //todo: this goes to json file or a js file in data folder for local dev env 
 //todo add the env 
 const getTitelsList = async () => {
-    return  [ 
-        {
-            name: "my-story",
-            link: "svg/my-story.svg"
-        },
-        {
-            name: "my-work",
-            link: "svg/my-work.svg"
-        },
-        {
-            name: "reach-out",
-            link: "svg/reach-out.svg"
-        },
-        {
-            name: "buy-me-a-coffee",
-            link: "svg/buy-me-a-coffee.svg"
-        },
-    ]
+    if(targetEnverment()=== ENV_CONST.prod){
+        
+    }else if(targetEnverment()=== ENV_CONST.dev) {
+        return titlesList
+    }else if(targetEnverment()=== ENV_CONST.emy) {
+        
+    }
 }
 
+
+import { doc, getDoc } from "firebase/firestore"
+
+const docRef = doc(db, 'titles-list')
+const docSnap = await getDoc(docRef)
+
+if (docSnap.exists()) {
+  console.log("Document data:", docSnap.data())
+} else {
+ 
+  console.log("No such document!")
+}
+
+console.log(await await fetchDownloadURL(myModelRef))
 
 // todo: this goes to features folder under carousel folder
 // * this to abstract the process of get  the svg from firebase storage
@@ -526,10 +532,12 @@ const getTitles = async (obj) => {
         titles:materilizedTitles
     }
 }
+
 let ab = {}
 ab = await getTitles(ab)
 
-console.log( ab)
+console.log( getTitelsList())
+
 
 // global =  await myTitles(global) 
 
