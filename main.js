@@ -35,8 +35,20 @@ import { routes } from './router'
 import { async } from '@firebase/util'
 
 import easeInOutQuint from './utilities/animation/ease-in-out-quint.js'
+import easeInOutSin from './utilities/animation/ease-in-out-sin.js'
 
 import loadAsset from './utilities/load-asset.js'
+
+import targetEnverment from './utilities/target-enverment'
+
+import titelsURLs from './utilities/titles-urls.js'
+
+import divideTitles from  './utilities/divide-titles.js'
+
+import getRawTitles from './utilities/get-raw-titles.js'
+
+import materilizeTitles from './utilities/materilize-titles'
+
 
 /** global */
 //!!! impotatnt !!!
@@ -77,9 +89,30 @@ let start, previousTimeStamp
 let done = false
 
 
+
+//** import titels */ 
 // ! **********************************************************************
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ! **********************************************************************
 
 let color = [
     0x00ff00,
@@ -93,7 +126,7 @@ let color = [
     0xff9933,
     0x00ffcc
 
-]
+] //! this is a moch 
 
 let meshes = [] //! this is a moch : will be remplaced by fetch titles 
 
@@ -314,32 +347,16 @@ let  resetFrame = () => {
     frame = 0
 }
 
-let scaleSection = (mesh,scale) => {
-
-    
-    
-}
-
-
-
-
 
 
 let scaleSections = (scale) => {
-    
     meshes.forEach(
         obj=>{ 
             obj.mesh.scale.setX(scale)
         }
-    )
-    
+    )   
 }
 
-
-
-let easeInOutSin = (t, b, c, d) => {
-	return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
-}
 
 let curve = (pos ) => {
    return easeInOutSin(pos , 1 , .55 , 7)
@@ -350,13 +367,15 @@ let updateSensitivity = (pos) => {
     return easeInOutQuint(pos , .4 , 1 , 6)
 }
 
+let carousel = () => {
+    mouseEvent()
+    touchEvent()
+    wheelEvent()
+    createMeshesArr()//! moch
+    updateModelsPositionsOnScrolling()
+}
 
-
-mouseEvent()
-touchEvent()
-wheelEvent()
-createMeshesArr()//! moch
-updateModelsPositionsOnScrolling()
+carousel()
 
 
 
@@ -395,7 +414,6 @@ function animation() {
     if(frame===duration){
         isAnimationStarted = false
     }
-    
     requestAnimationFrame(animation)
     renderer.render(scene, camera)
    
@@ -410,49 +428,22 @@ animation()
 
 
 
-// //todo: this goes to services
-// // * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
-// const titelsURLs = async (arr) => {
-//     return await Promise.all(arr.map(async element => {
-//         const SVGURL=  await envermentStorage( routes, targetEnverment ) + element.link
-//         return { name: element.name, svgLink: SVGURL }
-//     }))
-// }
-
-// //todo: this goes to services
-// // * arr is arr of urls  and names
-// const getRawTitels = async ( arr ) => {
-//     return await Promise.all(arr.map( async element => {
-//         const rawSVG = await loadAsset(element.svgLink, SVGLoader)
-//         return { name: element.name, rawSVG: rawSVG }
-//     })) 
-// }
-
-// //todo: this goes to utils
-// // * arra is array of raw svg from firebase storage and  names
-// const devidedTitltes = async (arr) => {
-//     return  await Promise.all(arr.map(async element => {
-//         const devidedSVG = splitObject(element.rawSVG)
-//         return { name: element.name, devidedSVG: devidedSVG }
-//     }))
-// }
+//todo: this goes to services
+// * array is a list of svg got from firestore (in dev !!! now !!!  we use a simple array)
 
 
-//todo: this goes to lib for three js
+//todo: this goes to services
+// * arr is arr of urls  and names
+
+
+//todo: this goes to utils
+// * arra is array of raw svg from firebase storage and  names
+
+
+
+// todo: this goes to lib for three js
 // * arra is array of devided svg from firebase storage and  names
-// const materilizedtitles = async (arr) => {
-//     return await Promise.all(arr.map( element => {
-//         return {
-//             name: element.name, 
-//             svg: [ ...element.devidedSVG ], 
-//             materilizedSVG: [
-//                 materilizeSVG(element.devidedSVG[0]),
-//                 materilizeSVG(element.devidedSVG[1]),
-//                 materilizeSVG(element.devidedSVG[2])
-//             ]
-//         }
-//     }))
-// }
+
 
 
 
@@ -495,49 +486,55 @@ animation()
 
 
 
-// // from firestore 
-// // ! this is a moch 
-// //todo: this goes to json file or a js file in data folder for local dev env 
-// const getTitelsList = async () => {
-//     return  [ 
-//         {
-//             name: "my-story",
-//             link: "svg/my-story.svg"
-//         },
-//         {
-//             name: "my-work",
-//             link: "svg/my-work.svg"
-//         },
-//         {
-//             name: "reach-out",
-//             link: "svg/reach-out.svg"
-//         },
-//         {
-//             name: "buy-me-a-coffee",
-//             link: "svg/buy-me-a-coffee.svg"
-//         },
-//     ]
-// }
+// from firestore 
+// ! this is a moch 
+//todo: this goes to json file or a js file in data folder for local dev env 
+//todo add the env 
+const getTitelsList = async () => {
+    return  [ 
+        {
+            name: "my-story",
+            link: "svg/my-story.svg"
+        },
+        {
+            name: "my-work",
+            link: "svg/my-work.svg"
+        },
+        {
+            name: "reach-out",
+            link: "svg/reach-out.svg"
+        },
+        {
+            name: "buy-me-a-coffee",
+            link: "svg/buy-me-a-coffee.svg"
+        },
+    ]
+}
 
 
-//todo: this goes to features folder under carousel folder
+// todo: this goes to features folder under carousel folder
 // * this to abstract the process of get  the svg from firebase storage
-// const myTitles = async (obj) => { 
-//     const titles = await getTitelsList()
-//     const svgURLs = await titelsURLs(titles)
-//     const rawTitles = await getRawTitels(svgURLs)
-//     const devidedTitles = await devidedTitltes(rawTitles)
-//     const materilizedTitles = await materilizedtitles(devidedTitles)
+const getTitles = async (obj) => { 
+    const titles = await getTitelsList() // this function will need the the env type 
+    const svgURLs = await titelsURLs(titles)
+    const rawTitles = await getRawTitles(svgURLs)
+    const devidedTitles = await divideTitles(rawTitles)
+    const materilizedTitles = await materilizeTitles(devidedTitles)
 
-//     return {
-//         ...obj,
-//         titles:materilizedTitles
-//     }
-// }
+    return {
+        ...obj,
+        titles:materilizedTitles
+    }
+}
+let ab = {}
+ab = await getTitles(ab)
 
- 
+console.log( ab)
+
+// global =  await myTitles(global) 
 
 
+// console.log(global)
 /** texture loader  */
 
 /** Debug */

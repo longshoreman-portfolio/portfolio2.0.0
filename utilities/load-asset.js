@@ -7,6 +7,7 @@ export default async function loadAsset( url, loader ) {
         },
         ( xhr ) => {
             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' )
+            //todo : return loading status
         },
         ( error ) => {
             console.error( 'An error happened:', error )
