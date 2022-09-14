@@ -1,4 +1,4 @@
-let mochTitelsList = [
+const mochTitelsList = [
     {
         name: "my-story",
         link: "svg/my-story.svg"
@@ -17,5 +17,6 @@ let mochTitelsList = [
     }
 ]
 
+export { mochTitelsList }
 
 
