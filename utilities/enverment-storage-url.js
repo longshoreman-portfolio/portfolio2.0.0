@@ -1,6 +1,10 @@
-export default function storageURL ( URLs, targetEnverment ) { 
-    return  targetEnverment() === "production" ? URLs.production //production storage
-        :   targetEnverment() === "emulator" ? URLs.emulator //emulator storage
-        :   targetEnverment() === "development" ? URLs.development //directory storage
+import targetEnverment from './target-enverment'
+
+let storageURL = ( URLs ) => { 
+    return  targetEnverment() === "production" ? URLs.production
+        :   targetEnverment() === "emulator" ? URLs.emulator
+        :   targetEnverment() === "development" ? URLs.development
         :   console.error("Error: target enverment out of scope")
 }
+
+export default storageURL
