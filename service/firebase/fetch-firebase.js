@@ -1,11 +1,13 @@
-import { doc, getDoc } from "firebase/firestore";
+import { db }  from '../../firebase-config.js'
 
-const docRef = doc(db, "cities", "SF");
-const docSnap = await getDoc(docRef);
+import { getDocs, collection } from "firebase/firestore"
 
-if (docSnap.exists()) {
-  console.log("Document data:", docSnap.data());
-} else {
- 
-  console.log("No such document!");
+let fetchAllDocs = async ( col ) => {
+    const querySnapshot = await getDocs(collection(db, col))
+    let array = querySnapshot.docs.map((doc)=> {
+       return doc.data()
+    })
+    return array
 }
+
+export default fetchAllDocs

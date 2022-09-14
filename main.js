@@ -53,6 +53,8 @@ import { ENV_CONST } from './data/env'
 
 import { titlesList } from './data/titles-list'
 
+import fetchAllDocs from './service/firebase/fetch-firebase.js'
+
 /** global */
 //!!! impotatnt !!!
 //todo: ditch the global letiable maybe use clouser ! 
@@ -495,28 +497,15 @@ animation()
 //todo add the env 
 const getTitelsList = async () => {
     if(targetEnverment()=== ENV_CONST.prod){
-        
+        return await fetchAllDocs( 'titles-list')
     }else if(targetEnverment()=== ENV_CONST.dev) {
         return titlesList
     }else if(targetEnverment()=== ENV_CONST.emy) {
-        
+        // * Using the same as the prod because the data set is already constructed.
+        return await fetchAllDocs( 'titles-list')
     }
 }
 
-
-import { doc, getDoc } from "firebase/firestore"
-
-const docRef = doc(db, 'titles-list')
-const docSnap = await getDoc(docRef)
-
-if (docSnap.exists()) {
-  console.log("Document data:", docSnap.data())
-} else {
- 
-  console.log("No such document!")
-}
-
-console.log(await await fetchDownloadURL(myModelRef))
 
 // todo: this goes to features folder under carousel folder
 // * this to abstract the process of get  the svg from firebase storage
@@ -536,7 +525,7 @@ const getTitles = async (obj) => {
 let ab = {}
 ab = await getTitles(ab)
 
-console.log( getTitelsList())
+//console.log( getTitelsList())
 
 
 // global =  await myTitles(global) 
