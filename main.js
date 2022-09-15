@@ -497,14 +497,15 @@ animation()
 //todo add the env 
 const getTitelsList = async () => {
     if(targetEnverment()=== ENV_CONST.prod){
-        return await fetchAllDocs( 'titles-list')
+        return await fetchAllDocs('titles-list')
     }else if(targetEnverment()=== ENV_CONST.dev) {
         return titlesList
     }else if(targetEnverment()=== ENV_CONST.emy) {
         // * Using the same as the prod because the data set is already constructed.
-        return await fetchAllDocs( 'titles-list')
+        return await fetchAllDocs('titles-list')
     }
 }
+
 
 
 // todo: this goes to features folder under carousel folder
@@ -523,7 +524,7 @@ const getTitles = async (obj) => {
 }
 
 let ab = {}
-ab = await getTitles(ab)
+//ab = await getTitles(ab)
 
 //console.log( getTitelsList())
 
