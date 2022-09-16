@@ -170,7 +170,8 @@ let touchStartEvent = () => {
 
 let touchEndEvent = () => {
     document.addEventListener("touchend", ()=>{
-        document.removeEventListener('mousemove',handleTouchMove)
+        document.removeEventListener('mousemove',handle
+                                     Move)
         resetFrame()
         updateModelsPositionsOnScrolling()
         isAnimationStarted=true
@@ -190,7 +191,7 @@ let handleTouchMove = (event) => {
 
         if(previousTouch){
             event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
-            scrollTarget = event.movementX*2.5*sensitivityCoefficient
+            scrollTarget = event.movementX*0.5*sensitivityCoefficient
             currentScroll += scroll
             updateModelsPositionsOnScrolling()           
         }
