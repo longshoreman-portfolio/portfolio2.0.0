@@ -170,8 +170,7 @@ let touchStartEvent = () => {
 
 let touchEndEvent = () => {
     document.addEventListener("touchend", ()=>{
-        document.removeEventListener('mousemove',handle
-                                     Move)
+        document.removeEventListener('mousemove',handleTouchMove)
         resetFrame()
         updateModelsPositionsOnScrolling()
         isAnimationStarted=true
