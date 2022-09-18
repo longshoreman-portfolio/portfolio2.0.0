@@ -190,7 +190,7 @@ let handleTouchMove = (event) => {
 
         if(previousTouch){
             event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
-            scrollTarget = event.movementX*0.5*sensitivityCoefficient
+            scrollTarget = event.movementX*0.3*sensitivityCoefficient
             currentScroll += scroll
             updateModelsPositionsOnScrolling()           
         }
