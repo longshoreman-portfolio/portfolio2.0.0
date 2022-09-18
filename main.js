@@ -12,48 +12,54 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 import { addModelToScene } from './helpers/model'    
 
-import fetchDownloadURL from './service/firebase/fetch-download-url.js'
+import fetchDownloadURL from './service/firebase/fetch-download-url'
 
-import splitObject from './utilities/split-object.js'
+import splitObject from './utilities/split-object'
 
-import envermentStorage from './utilities/enverment-storage-url.js'
+import envermentStorage from './utilities/enverment-storage-url'
 
-import materilizeSVG from './lib/three-js/materilize-SVG.js'
+
 
 import * as dat from 'dat.gui'
 
 
 
-import {  ref, getDownloadURL , connectStorageEmulator } from "firebase/storage";
+import {  ref, getDownloadURL , connectStorageEmulator } from 'firebase/storage'
 
-import { app, appStorage, db }  from './firebase-config.js'
+import { app, appStorage, db }  from './firebase-config'
 
-import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps.js'
+import {boxWithRoundedEdges, cylinderWithroundedendge } from './helpers/shaps'
 
 import { routes } from './router'
 
 import { async } from '@firebase/util'
 
-import easeInOutQuint from './utilities/animation/ease-in-out-quint.js'
-import easeInOutSin from './utilities/animation/ease-in-out-sin.js'
+import easeInOutQuint from './utilities/animation/ease-in-out-quint'
+import easeInOutSin from './utilities/animation/ease-in-out-sin'
 
-import loadAsset from './utilities/load-asset.js'
+import loadAsset from './utilities/load-asset'
 
 import targetEnverment from './utilities/target-enverment'
 
-import titelsURLs from './utilities/titles-urls.js'
+import titelsURLs from './utilities/titles-urls'
 
-import divideTitles from  './utilities/divide-titles.js'
+import divideTitles from  './utilities/divide-titles'
 
-import getRawTitles from './utilities/get-raw-titles.js'
+import getRawTitles from './lib/three-js/get-raw-titles'
 
 import materilizeTitles from './utilities/materilize-titles'
 
-import { ENV_CONST } from './data/env'
-
 import { titlesList } from './data/titles-list'
 
-import fetchAllDocs from './service/firebase/fetch-firebase.js'
+import { lists } from './data/lists'
+
+import fetchAllDocs from './service/firebase/fetch-firebase'
+
+import refrenceAssets from './service/firebase/refrence-assets'
+
+import getAssetsList from './service/firebase/get-assets-list'
+
+import downloadURLs from './service/firebase/download-urls'
 
 /** global */
 //!!! impotatnt !!!
@@ -495,16 +501,25 @@ animation()
 // ! this is a moch 
 //todo: this goes to json file or a js file in data folder for local dev env 
 //todo add the env 
-const getTitelsList = async () => {
-    if(targetEnverment()=== ENV_CONST.prod){
-        return await fetchAllDocs('titles-list')
-    }else if(targetEnverment()=== ENV_CONST.dev) {
-        return titlesList
-    }else if(targetEnverment()=== ENV_CONST.emy) {
-        // * Using the same as the prod because the data set is already constructed.
-        return await fetchAllDocs('titles-list')
-    }
-}
+
+
+
+
+
+
+
+const models = getAssetsList(lists.models)
+const titles = getAssetsList(lists.titles)
+
+console.log('models',models)
+console.log('titles',titles)
+
+
+
+
+
+const mySVGRef = ref( appStorage, 'SVGs/my-story.svg')
+const mySVG = await fetchDownloadURL(mySVGRef)
 
 
 
@@ -512,11 +527,28 @@ const getTitelsList = async () => {
 // * this to abstract the process of get  the svg from firebase storage
 const getTitles = async (obj) => { 
     const titles = await getTitelsList() // this function will need the the env type 
-    const svgURLs = await titelsURLs(titles)
-    const rawTitles = await getRawTitles(svgURLs)
-    const devidedTitles = await divideTitles(rawTitles)
-    const materilizedTitles = await materilizeTitles(devidedTitles)
 
+
+
+    const refs = await refrenceAssets(titlesList)
+    console.log('refs',refs)
+
+    const svgURLs = await  downloadURLs(refs) 
+    console.log('svgURLs',svgURLs)
+
+
+ //! fix URL for emulator and production 
+    const rawTitles = await getRawTitles(svgURLs)
+    console.log('rawTitles',rawTitles)
+    
+
+
+    const devidedTitles = await divideTitles(rawTitles)
+    console.log('devidedTitles',devidedTitles)
+
+
+    const materilizedTitles = await materilizeTitles(devidedTitles)
+    console.log('materilizedTitles',materilizedTitles)
     return {
         ...obj,
         titles:materilizedTitles
@@ -1012,31 +1044,31 @@ renderer.render(scene, camera)
 //         //todo: new approach : this should only load SVGs
 //         //!-----------------------------------------------------
 
-//         // todo: to abstract
-//         // todo: create a new array with objects and the name
-//         // * to get  from the global
-//         //global = await myTitles(global)
-//         let  myTitelsSVGs = global.titles
+        // todo: to abstract
+        // todo: create a new array with objects and the name
+        // * to get  from the global
+        //global = await myTitles(global)
+        //let  myTitelsSVGs = global.titles
 
-//         // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
+        // const myTitelsSVGs = await Promise.all(mySVGsMoch.map(async element => {
            
-//         //     const SVGURL = await envermentStorage( routes, targetEnverment ) + element.link
+        //     const SVGURL = await envermentStorage( routes, targetEnverment ) + element.link
 
 
-//         //     const rawSVG = await loadAsset(SVGURL, SVGloader)
+        //     const rawSVG = await loadAsset(SVGURL, SVGloader)
 
-//         //     const devidedSVG = splitObject(rawSVG)
+        //     const devidedSVG = splitObject(rawSVG)
 
-//         //     return {
-//         //         name: element.name, 
-//         //         svg: [ ...devidedSVG ], 
-//         //         materilizedSVG: [
-//         //             materilizeSVG(devidedSVG[0]),
-//         //             materilizeSVG(devidedSVG[1]),
-//         //             materilizeSVG(devidedSVG[2])
-//         //         ]
-//         //     }
-//         // }))
+        //     return {
+        //         name: element.name, 
+        //         svg: [ ...devidedSVG ], 
+        //         materilizedSVG: [
+        //             materilizeSVG(devidedSVG[0]),
+        //             materilizeSVG(devidedSVG[1]),
+        //             materilizeSVG(devidedSVG[2])
+        //         ]
+        //     }
+        // }))
 
 
 //         /** init */
