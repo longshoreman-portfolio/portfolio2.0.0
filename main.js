@@ -180,39 +180,28 @@ let touchEndEvent = () => {
         resetFrame()
         updateModelsPositionsOnScrolling()
         isAnimationStarted=true
-        //! reset previousTouch
     })
 }
 
 
 let touchMoveEvent = () => {
+    scroll = 0
+    scrollTarget = 0
     document.addEventListener("touchmove", handleTouchMove)
 }
 
 
-let prevScroll = currentScroll
+
 
 let handleTouchMove = (event) => {
- 
-        const touch = event.touches[0]
-        
-        if(previousTouch){
-
-            
-            event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
-            scrollTarget = event.movementX*0.3*sensitivityCoefficient
-            currentScroll += scroll
-            
-            if (Math.abs(prevScroll - currentScroll) > 10 ) {
-                console.log('currentScroll', currentScroll)
-                console.log('prevScroll', prevScroll)
-
-
-            }
-
-            prevScroll = currentScroll
-        }
-        previousTouch = touch 
+    const touch = event.touches[0]
+    if(previousTouch){
+        event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
+        scrollTarget = event.movementX*0.5*sensitivityCoefficient
+        currentScroll += scroll
+        updateModelsPositionsOnScrolling()           
+    }
+    previousTouch = touch 
 }
 
 
@@ -240,6 +229,8 @@ let mouseUpEvent = () => {
 }
 
 let mouseMoveEvent = () => {
+    scroll = 0
+    scrollTarget = 0
     document.addEventListener("mousemove", handleMosueMove)
 }
 
@@ -257,6 +248,8 @@ let mouseEvent = () => {
 }
 
 let wheelStartEnvent = ( ) => {
+    scroll = 0
+    scrollTarget = 0
     document.addEventListener("wheel", (event)=>{
         scrollTarget = event.wheelDelta*0.1*sensitivityCoefficient
         currentScroll += scroll
@@ -270,7 +263,7 @@ let wheelStopEvent = () => {
 
 let handleWheelStop = () => { 
     resetFrame()
-    updateModelsPositionsOnScrolling()
+    //updateModelsPositionsOnScrolling()
     isAnimationStarted=true
 }
 
@@ -411,6 +404,9 @@ function animation() {
     scroll = 0.5*scroll.toFixed(3)
     scrollTarget = 0.5*scrollTarget.toFixed(3)
     currentScroll += (scroll*0.01)
+
+
+    console.log('scroll',scroll.toFixed(5),'  |  scrollTarget', scrollTarget.toFixed(5),  '  |  currentScroll', currentScroll.toFixed(3))
     
     frame += 1
 
