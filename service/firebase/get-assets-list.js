@@ -8,6 +8,8 @@ import { modelsList } from '../../data/models-list'
 
 import targetEnverment from '../../utilities/target-enverment'
 
+import fetchAllDocs from './fetch-firebase'
+
 
 let getAssetsList = async (listName) => {
     if(targetEnverment()=== ENV_CONST.prod){
