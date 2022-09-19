@@ -70,7 +70,7 @@ const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth  / window.innerHeight, 1, 1000 )
 
 let global = {
-    camera: {position: new THREE.Vector3(0,15,60)},
+    camera: {position: new THREE.Vector3(0,15,160)},
     titles: [],
     cameraSnapPositions: [], //! remve new strategy camera fixed!  elements moves
     //middleSectionState: []
@@ -176,10 +176,11 @@ let touchStartEvent = () => {
 
 let touchEndEvent = () => {
     document.addEventListener("touchend", ()=>{
-        document.removeEventListener('mousemove',handleTouchMove)
+        document.removeEventListener('touchstart',handleTouchMove)
         resetFrame()
         updateModelsPositionsOnScrolling()
         isAnimationStarted=true
+        //! reset previousTouch
     })
 }
 
@@ -189,16 +190,27 @@ let touchMoveEvent = () => {
 }
 
 
+let prevScroll = currentScroll
 
 let handleTouchMove = (event) => {
  
         const touch = event.touches[0]
-
+        
         if(previousTouch){
+
+            
             event.movementX = (touch.pageX - previousTouch.pageX).toFixed(2)
             scrollTarget = event.movementX*0.3*sensitivityCoefficient
             currentScroll += scroll
-            updateModelsPositionsOnScrolling()           
+            
+            if (Math.abs(prevScroll - currentScroll) > 10 ) {
+                console.log('currentScroll', currentScroll)
+                console.log('prevScroll', prevScroll)
+
+
+            }
+
+            prevScroll = currentScroll
         }
         previousTouch = touch 
 }
@@ -419,7 +431,7 @@ function animation() {
     if(isAnimationStarted ) {
         let distance = distanceToTargetPosition( margin, currentScroll)
         meshes = updateModelsPositionsOnAnimation( meshes, frame, distance, duration )
-        currentScroll += lagInCurrnetScroll( frame, duration, distance ) 
+        currentScroll += lagInCurrnetScroll( frame, duration, distance )//! + number of margin * margin 
         
     }
     if(frame===duration){
@@ -503,18 +515,47 @@ animation()
 //todo add the env 
 
 
+const getSVGPathForDev = (element) => { 
+    return envermentStorage() + element.path
+}
+
+const getSVGsPathsForDev = () => {
+
+}
 
 
 
 
 
-const models = getAssetsList(lists.models)
-const titles = getAssetsList(lists.titles)
+
+
+const models = await getAssetsList(lists.models)
+const titles = await getAssetsList(lists.titles)
+
+
+// let a1 = await getRawTitles([{ name: titles[0].name, url: getSVGPathForDev(titles[0]) }])
+
+
+// let a2 = await divideTitles(a1)
+
+// let a3 = await materilizeTitles(a2)
+
+
+// console.log(a3)
+// a3[0].materilizedSVG[0].position.x  =(  currentScroll + 64513*wholeWidth )%wholeWidth - 2*margin
+
+// a3[0].materilizedSVG[0].scale.set(1, 1, 10100)
+
+
+// scene.add(a3[0].materilizedSVG[0])
+
+
+
+
+
 
 console.log('models',models)
 console.log('titles',titles)
-
-
 
 
 
